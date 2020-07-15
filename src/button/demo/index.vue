@@ -147,8 +147,6 @@ export default {
 @import '../../style/var';
 
 .demo-button {
-  background: @white;
-
   .van-button {
     &--large {
       margin-bottom: @padding-md;

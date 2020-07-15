@@ -1,21 +1,9 @@
-import Vue from 'vue';
 import { sortChildren } from '../utils/vnodes';
 
-type ChildrenMixinOptions = {
-  indexKey?: any;
-};
-
-type ChildrenMixinThis = {
-  disableBindRelation?: boolean;
-};
-
-export function ChildrenMixin(
-  parent: string,
-  options: ChildrenMixinOptions = {}
-) {
+export function ChildrenMixin(parent, options = {}) {
   const indexKey = options.indexKey || 'index';
 
-  return Vue.extend({
+  return {
     inject: {
       [parent]: {
         default: null,
@@ -24,11 +12,11 @@ export function ChildrenMixin(
 
     computed: {
       parent() {
-        if ((this as ChildrenMixinThis).disableBindRelation) {
+        if (this.disableBindRelation) {
           return null;
         }
 
-        return (this as any)[parent];
+        return this[parent];
       },
 
       [indexKey]() {
@@ -42,6 +30,14 @@ export function ChildrenMixin(
       },
     },
 
+    watch: {
+      disableBindRelation(val) {
+        if (!val) {
+          this.bindRelation();
+        }
+      },
+    },
+
     mounted() {
       this.bindRelation();
     },
@@ -49,7 +45,7 @@ export function ChildrenMixin(
     beforeDestroy() {
       if (this.parent) {
         this.parent.children = this.parent.children.filter(
-          (item: any) => item !== this
+          (item) => item !== this
         );
       }
     },
@@ -67,10 +63,10 @@ export function ChildrenMixin(
         this.parent.children = children;
       },
     },
-  });
+  };
 }
 
-export function ParentMixin(parent: string) {
+export function ParentMixin(parent) {
   return {
     provide() {
       return {

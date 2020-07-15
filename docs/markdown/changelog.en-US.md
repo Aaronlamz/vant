@@ -10,6 +10,96 @@ Vant follows [Semantic Versioning 2.0.0](https://semver.org/lang/zh-CN/).
 - Minor version：released every one to two months, including backwards compatible features.
 - Major version：including breaking changes and new features.
 
+### [v2.9.2](https://github.com/youzan/vant/compare/v2.9.1...v2.9.2)
+
+`2020-07-14`
+
+**Feature**
+
+- Calendar: add first-day-of-week prop [#6468](https://github.com/youzan/vant/issues/6468)
+- DatetimePicker: add columns-order prop [#6672](https://github.com/youzan/vant/issues/6672) [#6768](https://github.com/youzan/vant/issues/6768)
+
+**Bug Fixes**
+
+- Tab: should not trigger route when disabled [#6782](https://github.com/youzan/vant/issues/6782)
+- Sku: fix label color [#6771](https://github.com/youzan/vant/issues/6771)
+- Sku: image cell word wrap [#6777](https://github.com/youzan/vant/issues/6777)
+
+### [v2.9.1](https://github.com/youzan/vant/compare/v2.9.0...v2.9.1)
+
+`2020-07-12`
+
+**Feature**
+
+- DatetimePicker: add datehour type [#6732](https://github.com/youzan/vant/issues/6732)
+- Field: add clear-trigger prop [#6699](https://github.com/youzan/vant/issues/6699)
+- Search: add clear-trigger prop [#6700](https://github.com/youzan/vant/issues/6700)
+- Uploader: add preview-cover slot [#6707](https://github.com/youzan/vant/issues/6707)
+- ShareSheet: add click-overlay event [#6765](https://github.com/youzan/vant/issues/6765)
+- Stepper: add allow-empty prop [#6759](https://github.com/youzan/vant/issues/6759)
+- Steps: add inactive-color prop [#6758](https://github.com/youzan/vant/issues/6758)
+- SubmitBar: add button-color prop [#6757](https://github.com/youzan/vant/issues/6757)
+- Sku: improve message datetime picker [8d29e5](https://github.com/youzan/vant/commit/8d29e5c8c6df278800865596f285c17029150963) [7343e5](https://github.com/youzan/vant/commit/7343e55409900635a0e39063edb9f67493048a54)
+
+**style**
+
+- ActionSheet: subname vertical align [#6756](https://github.com/youzan/vant/issues/6756)
+- Uploader: remove round border radius [#6748](https://github.com/youzan/vant/issues/6748)
+- Uploader: update delete icon style [#6750](https://github.com/youzan/vant/issues/6750)
+
+**Bug Fixes**
+
+- Calendar: subtitle not updated in some cases [#6723](https://github.com/youzan/vant/issues/6723)
+- Checkbox: dynamic bind group [#6730](https://github.com/youzan/vant/issues/6730)
+- Field: can't display six characters in iOS [#6743](https://github.com/youzan/vant/issues/6743)
+- Image: memory leak during SSR [#6721](https://github.com/youzan/vant/issues/6721)
+- ImagePreview: fit window resize [#6760](https://github.com/youzan/vant/issues/6760)
+- ImagePreview: swipeTo type should be optional [#6727](https://github.com/youzan/vant/issues/6727)
+- Picker: click during momentum case incorrect result [#6724](https://github.com/youzan/vant/issues/6724)
+- Popup: lock-scroll not work in some cases [#6698](https://github.com/youzan/vant/issues/6698)
+
+### [v2.9.0](https://github.com/youzan/vant/compare/v2.8.7...v2.9.0)
+
+`2020-07-03`
+
+**Feature**
+
+- Icon: add enlarge icon [1c97b1](https://github.com/youzan/vant/commit/1c97b1837f3f16f339773133b5e78b8a200c57f5)
+- Image: add default slot [#6613](https://github.com/youzan/vant/issues/6613)
+- ImagePreview: add swipeTo method [#6596](https://github.com/youzan/vant/issues/6596)
+- ImagePreview: add get-container prop [39b5be](https://github.com/youzan/vant/commit/39b5beeac0d4a7e74866cb92eb9e4644872cf41a)
+- NoticeBar: optimize replay delay [022196](https://github.com/youzan/vant/commit/02219625fb94384865b79cf27ecea5ae0c4f3bb0)
+- Sku: add lazy-load prop [#6598](https://github.com/youzan/vant/issues/6598)
+- Sku: add show-header-image prop [#6598](https://github.com/youzan/vant/issues/6598)
+- Sku: support large image mode [#6598](https://github.com/youzan/vant/issues/6598)
+- Sku: enable close-on-click-overlay prop by default [#6631](https://github.com/youzan/vant/issues/6631)
+- TreeSelect: add selected-icon prop [#6615](https://github.com/youzan/vant/issues/6615)
+
+**style**
+
+- ActionSheet: update description style [#6586](https://github.com/youzan/vant/issues/6586)
+- AddressEdit: adjust label width [#6591](https://github.com/youzan/vant/issues/6591)
+- AddressEdit: area picker use round popup [#6584](https://github.com/youzan/vant/issues/6584)
+- Button: adjust small button size [#6371](https://github.com/youzan/vant/issues/6371)
+- Cell: adjust inner border gap [#6686](https://github.com/youzan/vant/issues/6686)
+- ContactEdit: adjust label width [a77ebe](https://github.com/youzan/vant/commit/a77ebe11d722a3f242ef8e4125bb94629a56b81f)
+- Field: label color updated to gray-7 [#6581](https://github.com/youzan/vant/issues/6581)
+- Field: label width adjusted to 6em [#6583](https://github.com/youzan/vant/issues/6583) [#6589](https://github.com/youzan/vant/issues/6589)
+- ImagePreview: adjust index position [#6650](https://github.com/youzan/vant/issues/6650)
+- Picker: optimize option disabled cursor [#6579](https://github.com/youzan/vant/issues/6579)
+- Rate: the default color is adjusted to red [#6373](https://github.com/youzan/vant/issues/6373)
+- Uploader: update failed icon [#6653](https://github.com/youzan/vant/issues/6653)
+
+**Bug Fixes**
+
+- ImagePreview: fix longpress error on mobile safari [#6660](https://github.com/youzan/vant/issues/6660)
+- ImagePreview: fix incorrect position after scale [#6656](https://github.com/youzan/vant/issues/6656)
+- Field: fix label word wrap [#6590](https://github.com/youzan/vant/issues/6590)
+- NumberKeyboard: fix eliminate tap delay on safari [#6667](https://github.com/youzan/vant/issues/6667)
+- Picker: disabled not work in cascade mode [#6580](https://github.com/youzan/vant/issues/6580)
+- Picker: revert add @picker-option-height var [#6663](https://github.com/youzan/vant/issues/6663)
+- Stepper: fix incorrect button disable status [#6652](https://github.com/youzan/vant/issues/6652)
+
 ### [v2.8.7](https://github.com/youzan/vant/compare/v2.8.6...v2.8.7)
 
 `2020-06-19`

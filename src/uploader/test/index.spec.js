@@ -450,7 +450,7 @@ test('close-preview event', async () => {
   wrapper.find('.van-image').trigger('click');
 
   const preview = document.querySelector('.van-image-preview');
-  const swipe = preview.querySelector('.van-swipe__track');
+  const swipe = preview.querySelector('.van-swipe-item');
   triggerDrag(swipe, 0, 0);
 
   await later(300);
@@ -506,4 +506,17 @@ test('multiFile upload filter max-size file', async () => {
   await later();
 
   expect(wrapper.emitted('oversize')[0]).toBeTruthy();
+});
+
+test('preview-cover slot', () => {
+  const wrapper = mount(Uploader, {
+    propsData: {
+      fileList: [{ url: IMAGE }, { url: IMAGE }],
+    },
+    scopedSlots: {
+      'preview-cover': (item) => item.url,
+    },
+  });
+
+  expect(wrapper).toMatchSnapshot();
 });
