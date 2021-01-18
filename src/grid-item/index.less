@@ -12,15 +12,12 @@
     font-size: @grid-item-icon-size;
   }
 
-  &__icon-wrapper {
-    position: relative;
-  }
-
   &__text {
     color: @grid-item-text-color;
     font-size: @grid-item-text-font-size;
     line-height: 1.5;
-    word-wrap: break-word;
+    // https://github.com/youzan/vant/issues/3894
+    word-break: break-all;
   }
 
   &__icon + &__text {

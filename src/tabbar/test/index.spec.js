@@ -1,188 +1,171 @@
-import VueRouter from 'vue-router';
+import { nextTick, reactive, ref } from 'vue';
 import { mount, later, mockGetBoundingClientRect } from '../../../test';
-import Vue from 'vue';
+import { BORDER_TOP_BOTTOM } from '../../utils/constant';
 import Tabbar from '..';
+import TabbarItem from '../../tabbar-item';
 
-Vue.use(VueRouter);
+const activeClass = 'van-tabbar-item--active';
 
-test('route mode', async () => {
-  const router = new VueRouter();
-  const wrapper = mount({
-    router,
-    template: `
-      <van-tabbar route>
-        <van-tabbar-item replace to="/">
-          Tab
-        </van-tabbar-item>
-        <van-tabbar-item replace to="/search">
-          Tab
-        </van-tabbar-item>
-        <van-tabbar-item replace :to="{ path: '/star' }">
-          Tab
-        </van-tabbar-item>
-        <van-tabbar-item>
-          Tab
-        </van-tabbar-item>
-      </van-tabbar>
-    `,
+function getMockRouter() {
+  const $route = reactive({
+    name: '/',
+    path: '/',
   });
+  const push = (val) => {
+    if (typeof val === 'string') {
+      $route.name = val;
+      $route.path = val;
+    } else {
+      Object.assign($route, val);
+    }
+  };
+  const $router = {
+    push,
+    replace: push,
+  };
 
-  expect(wrapper).toMatchSnapshot();
+  return {
+    $route,
+    $router,
+  };
+}
+
+test('should match active tab by route path in route mode', async () => {
+  const wrapper = mount(
+    {
+      render: () => (
+        <Tabbar route>
+          <TabbarItem replace to="/">
+            Tab
+          </TabbarItem>
+          <TabbarItem replace to="/search">
+            Tab
+          </TabbarItem>
+          <TabbarItem replace to={{ path: '/star' }}>
+            Tab
+          </TabbarItem>
+          <TabbarItem>Tab</TabbarItem>
+        </Tabbar>
+      ),
+    },
+    {
+      global: {
+        mocks: getMockRouter(),
+      },
+    }
+  );
 
   const items = wrapper.findAll('.van-tabbar-item');
 
-  items.at(1).trigger('click');
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  expect(items[0].classes()).toContain(activeClass);
 
-  items.at(2).trigger('click');
-  items.at(3).trigger('click');
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  await items[1].trigger('click');
+  expect(items[1].classes()).toContain(activeClass);
+
+  await items[2].trigger('click');
+  expect(items[2].classes()).toContain(activeClass);
+
+  await items[3].trigger('click');
+  expect(items[3].classes()).not.toContain(activeClass);
 });
 
-test('route mode match by name', async () => {
-  const Foo = { render: () => 'Foo' };
-  const Bar = { render: () => 'Bar' };
-  const router = new VueRouter({
-    routes: [
-      { path: '/foo', component: Foo, name: 'foo' },
-      { path: '/bar', component: Bar, name: 'bar' },
-    ],
-  });
-
-  const wrapper = mount({
-    router,
-    template: `
-      <van-tabbar route>
-        <van-tabbar-item :to="{ name: 'foo' }">
-          Tab
-        </van-tabbar-item>
-        <van-tabbar-item :to="{ name: 'bar' }">
-          Tab
-        </van-tabbar-item>
-      </van-tabbar>
-    `,
-  });
+test('should match active tab by route name in route mode', async () => {
+  const wrapper = mount(
+    {
+      render: () => (
+        <Tabbar route>
+          <TabbarItem to={{ name: 'foo' }}>Tab</TabbarItem>
+          <TabbarItem to={{ name: 'bar' }}>Tab</TabbarItem>
+        </Tabbar>
+      ),
+    },
+    {
+      global: {
+        mocks: getMockRouter(),
+      },
+    }
+  );
 
   const items = wrapper.findAll('.van-tabbar-item');
-  items.at(0).trigger('click');
-  await later();
-  expect(wrapper).toMatchSnapshot();
 
-  items.at(1).trigger('click');
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  await items[0].trigger('click');
+  expect(items[0].classes()).toContain(activeClass);
+
+  await items[1].trigger('click');
+  expect(items[1].classes()).toContain(activeClass);
 });
 
-test('router NavigationDuplicated', async (done) => {
-  expect(async () => {
-    const router = new VueRouter();
-    const wrapper = mount({
-      router,
-      template: `
-      <van-tabbar route>
-        <van-tabbar-item replace to="/home">
-          Tab
-        </van-tabbar-item>
-      </van-tabbar>
-    `,
-    });
-
-    const item = wrapper.find('.van-tabbar-item');
-    item.trigger('click');
-    item.trigger('click');
-
-    await later();
-    done();
-  }).not.toThrow();
-});
-
-test('watch tabbar value', () => {
+test('should watch model-value and update active tab', async () => {
   const wrapper = mount({
-    template: `
-      <van-tabbar :value="value">
-        <van-tabbar-item>Tab</van-tabbar-item>
-        <van-tabbar-item>Tab</van-tabbar-item>
-      </van-tabbar>
-    `,
-    data() {
+    setup() {
+      const active = ref(0);
+      const updateActive = () => {
+        active.value = 1;
+      };
       return {
-        value: 0,
+        active,
+        updateActive,
       };
     },
-  });
-
-  wrapper.setData({ value: 1 });
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('click event', () => {
-  const onClick = jest.fn();
-  const onChange = jest.fn();
-
-  const wrapper = mount({
-    template: `
-      <van-tabbar @change="onChange">
-        <van-tabbar-item @click="onClick">Tab</van-tabbar-item>
-      </van-tabbar>
-    `,
-    methods: {
-      onClick,
-      onChange,
+    render() {
+      return (
+        <Tabbar modelValue={this.active}>
+          <TabbarItem>Tab</TabbarItem>
+          <TabbarItem>Tab</TabbarItem>
+        </Tabbar>
+      );
     },
   });
 
-  wrapper.find('.van-tabbar-item').trigger('click');
-  expect(onClick).toHaveBeenCalledTimes(1);
-  expect(onChange).toHaveBeenCalledTimes(0);
+  wrapper.vm.updateActive();
+  await nextTick();
+  const items = wrapper.findAll('.van-tabbar-item');
+  expect(items[1].classes()).toContain(activeClass);
 });
 
-test('name prop', () => {
+test('should match active tab by name when using name prop', () => {
   const onChange = jest.fn();
   const wrapper = mount({
-    template: `
-      <van-tabbar :value="value" @change="onChange">
-        <van-tabbar-item name="a">Tab</van-tabbar-item>
-        <van-tabbar-item name="b">Tab</van-tabbar-item>
-      </van-tabbar>
-    `,
-    data() {
+    setup() {
+      const active = ref('a');
       return {
-        value: 'a',
+        active,
       };
     },
-    methods: {
-      onChange,
+    render() {
+      return (
+        <Tabbar modelValue={this.active} onChange={onChange}>
+          <TabbarItem name="a">Tab</TabbarItem>
+          <TabbarItem name="b">Tab</TabbarItem>
+        </Tabbar>
+      );
     },
   });
 
-  wrapper.findAll('.van-tabbar-item').at(1).trigger('click');
-
+  wrapper.findAll('.van-tabbar-item')[1].trigger('click');
   expect(onChange).toHaveBeenCalledWith('b');
 });
 
-test('disable border', () => {
+test('should not render border when border prop is false', () => {
   const wrapper = mount(Tabbar, {
-    propsData: {
+    props: {
       border: false,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.classes()).not.toContain(BORDER_TOP_BOTTOM);
 });
 
-test('placeholder prop', () => {
+test('should render placeholder element when using placeholder prop', async () => {
   const restore = mockGetBoundingClientRect({ height: 50 });
-
   const wrapper = mount(Tabbar, {
-    propsData: {
+    props: {
       fixed: true,
       placeholder: true,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
-
+  await later();
+  expect(wrapper.html()).toMatchSnapshot();
   restore();
 });

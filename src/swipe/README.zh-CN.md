@@ -1,13 +1,18 @@
 # Swipe 轮播
 
+### 介绍
+
+用于循环播放一组图片或内容。
+
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Swipe, SwipeItem } from 'vant';
 
-Vue.use(Swipe);
-Vue.use(SwipeItem);
+const app = createApp();
+app.use(Swipe);
+app.use(SwipeItem);
 ```
 
 ## 代码演示
@@ -35,32 +40,26 @@ Vue.use(SwipeItem);
 </style>
 ```
 
-### 图片懒加载
+### 懒加载
 
-当 Swipe 中含有图片时，可以配合 [Lazyload](#/zh-CN/lazyload) 组件实现图片懒加载。
+当 Swipe 中含有图片时，可以通过 `lazy-render` 属性来开启懒加载模式。在懒加载模式下，只会渲染当前页和下一页。
 
 ```html
-<van-swipe :autoplay="3000">
-  <van-swipe-item v-for="(image, index) in images" :key="index">
-    <img v-lazy="image" />
+<van-swipe :autoplay="3000" lazy-render>
+  <van-swipe-item v-for="image in images" :key="image">
+    <img :src="image" />
   </van-swipe-item>
 </van-swipe>
 ```
 
 ```js
-import Vue from 'vue';
-import { Lazyload } from 'vant';
-
-Vue.use(Lazyload);
-
 export default {
-  data() {
-    return {
-      images: [
-        'https://img.yzcdn.cn/vant/apple-1.jpg',
-        'https://img.yzcdn.cn/vant/apple-2.jpg',
-      ],
-    };
+  setup() {
+    const images = [
+      'https://img.yzcdn.cn/vant/apple-1.jpg',
+      'https://img.yzcdn.cn/vant/apple-2.jpg',
+    ];
+    return { images };
   },
 };
 ```
@@ -80,10 +79,11 @@ export default {
 import { Toast } from 'vant';
 
 export default {
-  methods: {
-    onChange(index) {
+  setup() {
+    const onChange = (index) => {
       Toast('当前 Swipe 索引：' + index);
-    },
+    };
+    return { onChange };
   },
 };
 ```
@@ -127,9 +127,7 @@ export default {
   <van-swipe-item>3</van-swipe-item>
   <van-swipe-item>4</van-swipe-item>
   <template #indicator>
-    <div class="custom-indicator">
-      {{ current + 1 }}/4
-    </div>
+    <div class="custom-indicator">{{ current + 1 }}/4</div>
   </template>
 </van-swipe>
 
@@ -146,16 +144,18 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      current: 0,
+  setup() {
+    const current = ref(0);
+    const onChange = (index) => {
+      current.value = index;
     };
-  },
-  methods: {
-    onChange(index) {
-      this.current = index;
-    },
+    return {
+      current,
+      onChange,
+    };
   },
 };
 ```
@@ -164,20 +164,20 @@ export default {
 
 ### Swipe Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| autoplay | 自动轮播间隔，单位为 ms | _number \| string_ | - |
-| duration | 动画时长，单位为 ms | _number \| string_ | `500` |
-| initial-swipe | 初始位置索引值 | _number \| string_ | `0` |
-| width | 滑块宽度，单位为`px` | _number \| string_ | `auto` |
-| height | 滑块高度，单位为`px` | _number \| string_ | `auto` |
-| loop | 是否开启循环播放 | _boolean_ | `true` |
-| show-indicators | 是否显示指示器 | _boolean_ | `true` |
-| vertical | 是否为纵向滚动 | _boolean_ | `false` |
-| touchable | 是否可以通过手势滑动 | _boolean_ | `true` |
-| stop-propagation `v2.2.13` | 是否阻止滑动事件冒泡 | _boolean_ | `true` |
-| lazy-render `v2.5.8` | 是否延迟渲染未展示的轮播 | _boolean_ | `false` |
-| indicator-color | 指示器颜色 | _string_ | `#1989fa` |
+| 参数             | 说明                     | 类型               | 默认值    |
+| ---------------- | ------------------------ | ------------------ | --------- |
+| autoplay         | 自动轮播间隔，单位为 ms  | _number \| string_ | -         |
+| duration         | 动画时长，单位为 ms      | _number \| string_ | `500`     |
+| initial-swipe    | 初始位置索引值           | _number \| string_ | `0`       |
+| width            | 滑块宽度，单位为`px`     | _number \| string_ | `auto`    |
+| height           | 滑块高度，单位为`px`     | _number \| string_ | `auto`    |
+| loop             | 是否开启循环播放         | _boolean_          | `true`    |
+| show-indicators  | 是否显示指示器           | _boolean_          | `true`    |
+| vertical         | 是否为纵向滚动           | _boolean_          | `false`   |
+| touchable        | 是否可以通过手势滑动     | _boolean_          | `true`    |
+| stop-propagation | 是否阻止滑动事件冒泡     | _boolean_          | `true`    |
+| lazy-render      | 是否延迟渲染未展示的轮播 | _boolean_          | `false`   |
+| indicator-color  | 指示器颜色               | _string_           | `#1989fa` |
 
 ### Swipe Events
 
@@ -193,14 +193,14 @@ export default {
 
 ### Swipe 方法
 
-通过 ref 可以获取到 Swipe 实例并调用实例方法，详见[组件实例方法](#/zh-CN/quickstart#zu-jian-shi-li-fang-fa)。
+通过 ref 可以获取到 Swipe 实例并调用实例方法，详见[组件实例方法](#/zh-CN/advanced-usage#zu-jian-shi-li-fang-fa)。
 
 | 方法名 | 说明 | 参数 | 返回值 |
 | --- | --- | --- | --- |
-| prev `v2.4.2` | 切换到上一轮播 | - | - |
-| next `v2.4.2` | 切换到下一轮播 | - | - |
-| swipeTo | 切换到指定位置 | index: number, options: Options | void |
-| resize `v2.2.14` | 外层元素大小变化后，可以调用此方法来触发重绘 | - | void |
+| prev | 切换到上一轮播 | - | - |
+| next | 切换到下一轮播 | - | - |
+| swipeTo | 切换到指定位置 | index: number, options: Options | - |
+| resize | 外层元素大小或组件显示状态变化时，可以调用此方法来触发重绘 | - | - |
 
 ### swipeTo Options 格式
 
@@ -215,6 +215,19 @@ export default {
 | default   | 轮播内容     |
 | indicator | 自定义指示器 |
 
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                                       | 默认值          | 描述 |
+| ------------------------------------------ | --------------- | ---- |
+| @swipe-indicator-size                      | `6px`           | -    |
+| @swipe-indicator-margin                    | `@padding-sm`   | -    |
+| @swipe-indicator-active-opacity            | `1`             | -    |
+| @swipe-indicator-inactive-opacity          | `0.3`           | -    |
+| @swipe-indicator-active-background-color   | `@blue`         | -    |
+| @swipe-indicator-inactive-background-color | `@border-color` | -    |
+
 ## 常见问题
 
 ### 滑动轮播时为什么触发了 click 事件？
@@ -225,8 +238,33 @@ export default {
 
 ### 在桌面端无法操作组件？
 
-参见[在桌面端使用](#/zh-CN/quickstart#zai-zhuo-mian-duan-shi-yong)。
+参见[桌面端适配](#/zh-CN/advanced-usage#zhuo-mian-duan-gua-pei)。
 
 ### Swipe 组件功能太少，无法实现复杂效果？
 
 Vant 中的 Swipe 组件是比较轻量的，因此功能也比较基础。如果需要更复杂的轮播效果，推荐使用社区里一些优质的轮播库，比如 [vue-awesome-swiper](https://github.com/surmon-china/vue-awesome-swiper)。
+
+### 组件从隐藏状态切换到显示状态时，无法正确渲染？
+
+Swipe 组件在挂载时，会获取自身的宽度，并计算出轮播图的位置。如果组件一开始处于隐藏状态，则获取到的宽度永远为 0，因此无法正确计算位置。
+
+#### 解决方法
+
+方法一，如果是使用 `v-show` 来控制组件展示的，则替换为 `v-if` 即可解决此问题：
+
+```html
+<!-- Before -->
+<van-swipe v-show="show" />
+<!-- After -->
+<van-swipe v-if="show" />
+```
+
+方法二，调用组件的 resize 方法来主动触发重绘：
+
+```html
+<van-swipe v-show="show" ref="swipe" />
+```
+
+```js
+this.$refs.swipe.resize();
+```

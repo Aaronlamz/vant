@@ -1,29 +1,132 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders demo correctly 1`] = `
+exports[`should render demo and match snapshot 1`] = `
 <div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">文字提示</span></div>
-    </button> <button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">长文字提示</span></div>
-    </button></div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">加载提示</span></div>
-    </button> <button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">自定义加载图标</span></div>
-    </button></div>
-  <div><button class="van-button van-button--info van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">成功提示</span></div>
-    </button> <button class="van-button van-button--danger van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">失败提示</span></div>
-    </button></div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">自定义图标</span></div>
-    </button> <button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">展示图片</span></div>
-    </button></div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">动态更新提示</span></div>
-    </button></div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Text
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Loading
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Success
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Fail
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Custom Icon
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Custom Image
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Loading Type
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Top
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Bottom
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Update Message
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
 </div>
 `;

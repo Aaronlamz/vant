@@ -1,30 +1,110 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders demo correctly 1`] = `
+exports[`should render demo and match snapshot 1`] = `
 <div>
-  <div><button class="van-button van-button--danger van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">基础用法</span></div>
-    </button></div>
-  <div>
-    <div style="margin-bottom: 15px;"><button class="van-button van-button--info van-button--normal">
-        <div class="van-button__content"><span class="van-button__text">主要通知</span></div>
-      </button> <button class="van-button van-button--primary van-button--normal">
-        <div class="van-button__content"><span class="van-button__text">成功通知</span></div>
-      </button></div> <button class="van-button van-button--danger van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">危险通知</span></div>
-    </button> <button class="van-button van-button--warning van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">警告通知</span></div>
-    </button>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Basic Usage
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
   </div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">自定义颜色</span></div>
-    </button> <button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">自定义时长</span></div>
-    </button></div>
-  <div><button class="van-button van-button--primary van-button--normal">
-      <div class="van-button__content"><span class="van-button__text">组件调用</span></div>
-    </button>
-    <!---->
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Primary
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
   </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Success
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Danger
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Warning
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Custom Color
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Custom Duration
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Component Call
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+  <transition-stub>
+  </transition-stub>
 </div>
 `;

@@ -14,134 +14,132 @@ const secondOption = [
   { code: '120101', name: '和平区' },
 ];
 
-test('confirm & cancel event', async () => {
-  const onConfirm = jest.fn();
-  const onCancel = jest.fn();
+test('should emit confirm event after click the confirm button', () => {
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
     },
-    listeners: {
-      confirm: onConfirm,
-      cancel: onCancel,
-    },
   });
-
-  await later();
 
   wrapper.find('.van-picker__confirm').trigger('click');
-  wrapper.find('.van-picker__cancel').trigger('click');
-
-  expect(onConfirm).toHaveBeenCalledWith(firstOption, [0, 0, 0]);
-  expect(onCancel).toHaveBeenCalledWith(firstOption, [0, 0, 0]);
+  expect(wrapper.emitted('confirm')[0]).toEqual([firstOption, [0, 0, 0]]);
 });
 
-test('watch areaList & code', async () => {
+test('should emit cancel event after click the cancel button', () => {
+  const onCancel = jest.fn();
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
+      onCancel,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
-  wrapper.setProps({ value: '110117' });
+  wrapper.find('.van-picker__cancel').trigger('click');
+  expect(onCancel).toHaveBeenLastCalledWith(firstOption, [0, 0, 0]);
+});
+
+test('should watch value prop and render correctly', async () => {
+  const wrapper = mount(Area, {
+    props: {
+      areaList,
+    },
+  });
 
   await later();
-  expect(wrapper).toMatchSnapshot();
+  expect(
+    wrapper.find('.van-picker-column__item--selected').html()
+  ).toMatchSnapshot();
+  await wrapper.setProps({ value: '120225' });
 
-  wrapper.setProps({
-    value: '',
-  });
-  expect(wrapper).toMatchSnapshot();
+  await later();
+  expect(
+    wrapper.find('.van-picker-column__item--selected').html()
+  ).toMatchSnapshot();
+
+  await wrapper.setProps({ value: '' });
+  expect(
+    wrapper.find('.van-picker-column__item--selected').html()
+  ).toMatchSnapshot();
 });
 
-test('change option', () => {
-  const onChange = jest.fn();
+test('should emit change event after dragging options', () => {
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
-    },
-    listeners: {
-      change: onChange,
     },
   });
 
   const columns = wrapper.findAll('.van-picker-column');
-  expect(wrapper).toMatchSnapshot();
+  triggerDrag(columns[0], 0, -100);
+  columns[0].find('ul').trigger('transitionend');
+  triggerDrag(columns[2], 0, -100);
+  columns[2].find('ul').trigger('transitionend');
 
-  triggerDrag(columns.at(0), 0, -100);
-  columns.at(0).find('ul').trigger('transitionend');
-  expect(wrapper).toMatchSnapshot();
-
-  triggerDrag(columns.at(2), 0, -100);
-  columns.at(2).find('ul').trigger('transitionend');
-  expect(wrapper).toMatchSnapshot();
-
-  expect(onChange.mock.calls[0][1]).toEqual(secondOption);
+  expect(wrapper.emitted('change')[0][0]).toEqual(secondOption);
 });
 
-test('getValues method', () => {
+test('should return current values when calling getValues method', () => {
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
-    },
-    created() {
-      expect(this.getValues()).toEqual([]);
     },
   });
 
   expect(wrapper.vm.getValues()).toEqual(firstOption);
 });
 
-test('reset method', async () => {
+test('should reset selected option after calling the reset method', async () => {
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
       value: '120225',
     },
   });
 
   await later();
-  expect(wrapper).toMatchSnapshot();
+  expect(
+    wrapper.find('.van-picker-column__item--selected').html()
+  ).toMatchSnapshot();
+
   wrapper.vm.reset();
-  expect(wrapper).toMatchSnapshot();
+  await later();
+  expect(
+    wrapper.find('.van-picker-column__item--selected').html()
+  ).toMatchSnapshot();
 });
 
-test('columns-num prop', async () => {
+test('should render two columns when columns-num prop is two', async () => {
   const wrapper = mount(Area, {
-    propsData: {
+    props: {
       areaList,
       columnsNum: 3,
     },
   });
 
-  wrapper.setProps({
-    columnsNum: 2,
-  });
+  expect(wrapper.findAll('.van-picker-column').length).toEqual(3);
 
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  await wrapper.setProps({ columnsNum: 2 });
+  expect(wrapper.findAll('.van-picker-column').length).toEqual(2);
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('title slot', async () => {
+test('should render title slot correctly', () => {
   const wrapper = mount(Area, {
-    scopedSlots: {
+    slots: {
       title: () => 'Custom Title',
     },
   });
 
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-picker__toolbar').html()).toMatchSnapshot();
 });
 
-test('columns-top、columns-bottom slot', async () => {
+test('should render columns-top、columns-bottom slot correctly', () => {
   const wrapper = mount(Area, {
     slots: {
-      'columns-top': 'Top',
-      'columns-bottom': 'Bottom',
+      'columns-top': () => 'Top',
+      'columns-bottom': () => 'Bottom',
     },
   });
 
-  await later();
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });

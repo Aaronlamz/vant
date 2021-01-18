@@ -3,17 +3,18 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Icon } from 'vant';
 
-Vue.use(Icon);
+const app = createApp();
+app.use(Icon);
 ```
 
 ## Usage
 
 ### Basic Usage
 
-Use `name` prop to set icon name or icon URL
+Use `name` prop to set icon name or icon URL.
 
 ```html
 <van-icon name="chat-o" />
@@ -34,16 +35,16 @@ Use `badge` prop, the badge will be displayed in the upper right corner of the i
 
 ### Icon Color
 
-Use `color` prop to set icon color
+Use `color` prop to set icon color.
 
 ```html
-<van-icon name="chat-o" color="#1989fa" />
-<van-icon name="chat-o" color="#07c160" />
+<van-icon name="cart-o" color="#1989fa" />
+<van-icon name="fire-o" color="#ee0a24" />
 ```
 
 ### Icon Size
 
-Use `size` prop to set icon size
+Use `size` prop to set icon size.
 
 ```html
 <van-icon name="chat-o" size="40" /> <van-icon name="chat-o" size="3rem" />
@@ -56,6 +57,8 @@ Icon uses font file in `yzcdn.cn` by default，if you want to use the local font
 ```js
 import 'vant/lib/icon/local.css';
 ```
+
+> Tips: Starting from version 2.10.13, Vant will use local font files in woff2 format by default
 
 ### Add custom iconfont
 
@@ -82,18 +85,18 @@ import 'vant/lib/icon/local.css';
 
 ### Props
 
-| Attribute      | Description             | Type               | Default    |
-| -------------- | ----------------------- | ------------------ | ---------- |
-| name           | Icon name or URL        | _string_           | `''`       |
-| dot `v2.2.1`   | Whether to show red dot | _boolean_          | `false`    |
-| badge `v2.5.6` | Content of the badge    | _number \| string_ | `''`       |
-| color          | Icon color              | _string_           | `inherit`  |
-| size           | Icon size               | _number \| string_ | `inherit`  |
-| class-prefix   | ClassName prefix        | _string_           | `van-icon` |
-| tag            | HTML Tag                | _string_           | `i`        |
+| Attribute    | Description             | Type               | Default    |
+| ------------ | ----------------------- | ------------------ | ---------- |
+| name         | Icon name or URL        | _string_           | `''`       |
+| dot          | Whether to show red dot | _boolean_          | `false`    |
+| badge        | Content of the badge    | _number \| string_ | `''`       |
+| color        | Icon color              | _string_           | `inherit`  |
+| size         | Icon size               | _number \| string_ | `inherit`  |
+| class-prefix | ClassName prefix        | _string_           | `van-icon` |
+| tag          | HTML Tag                | _string_           | `i`        |
 
 ### Events
 
-| Event | Description               | Arguments      |
-| ----- | ------------------------- | -------------- |
-| click | Triggered when click icon | _event: Event_ |
+| Event | Description                  | Arguments      |
+| ----- | ---------------------------- | -------------- |
+| click | Emitted when icon is clicked | _event: Event_ |

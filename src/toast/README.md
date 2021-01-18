@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Toast } from 'vant';
 
-Vue.use(Toast);
+const app = createApp();
+app.use(Toast);
 ```
 
 ## Usage
@@ -23,12 +24,6 @@ Toast('Some messages');
 Toast.loading({
   message: 'Loading...',
   forbidClick: true,
-});
-
-Toast.loading({
-  message: 'Loading...',
-  forbidClick: true,
-  loadingType: 'spinner',
 });
 ```
 
@@ -51,13 +46,33 @@ Toast({
   message: 'Custom Image',
   icon: 'https://img.yzcdn.cn/vant/logo.png',
 });
+
+Toast.loading({
+  message: 'Loading...',
+  forbidClick: true,
+  loadingType: 'spinner',
+});
+```
+
+### Custom Position
+
+```js
+Toast({
+  message: 'Top',
+  position: 'top',
+});
+
+Toast({
+  message: 'Bottom',
+  position: 'bottom',
+});
 ```
 
 ### Update Message
 
 ```js
 const toast = Toast.loading({
-  duration: 0, // continuous display toast
+  duration: 0,
   forbidClick: true,
   loadingType: 'spinner',
   message: '3 seconds',
@@ -77,7 +92,7 @@ const timer = setInterval(() => {
 
 ### Global Method
 
-After import the Toast component, the `$toast` method is automatically mounted on Vue.prototype, making it easy to call within a vue component.
+After registering the Toast component through `app.use`, the `$toast` method will be automatically mounted on all subcomponents of the app.
 
 ```js
 export default {
@@ -106,16 +121,12 @@ toast2.clear();
 The Toast default configuration can be globally modified with the `Toast.setDefaultOptions` function.
 
 ```js
-// Set the duration of all Toast to 2000 ms
 Toast.setDefaultOptions({ duration: 2000 });
 
-// Set all loading types Toast to background unclickable
 Toast.setDefaultOptions('loading', { forbidClick: true });
 
-// Reset default options of all Toast
 Toast.resetDefaultOptions();
 
-// Reset default options of all loading Toast
 Toast.resetDefaultOptions('loading');
 ```
 
@@ -125,13 +136,13 @@ Toast.resetDefaultOptions('loading');
 
 | Methods | Attribute | Return value | Description |
 | --- | --- | --- | --- |
-| Toast | `options | message` | toast instance | Show toast |
-| Toast.loading | `options | message` | toast instance | Show loading toast |
-| Toast.success | `options | message` | toast instance | Show success toast |
-| Toast.fail | `options | message` | toast instance | Show fail toast |
+| Toast | `options \| message` | toast instance | Show toast |
+| Toast.loading | `options \| message` | toast instance | Show loading toast |
+| Toast.success | `options \| message` | toast instance | Show success toast |
+| Toast.fail | `options \| message` | toast instance | Show fail toast |
 | Toast.clear | `clearAll: boolean` | `void` | Close toast |
 | Toast.allowMultiple | - | `void` | Allow multlple toast at the same time |
-| Toast.setDefaultOptions | `type | options` | `void` | Set default options of all toasts |
+| Toast.setDefaultOptions | `type \| options` | `void` | Set default options of all toasts |
 | Toast.resetDefaultOptions | `type` | `void` | Reset default options of all toasts |
 
 ### Options
@@ -141,16 +152,40 @@ Toast.resetDefaultOptions('loading');
 | type | Can be set to `loading` `success` `fail` `html` | _string_ | `text` |
 | position | Can be set to `top` `middle` `bottom` | _string_ | `middle` |
 | message | Message | _string_ | `''` |
-| icon `v2.0.1` | Custom icon | _string_ | - |
-| iconPrefix `v2.0.9` | Icon className prefix | _string_ | `van-icon` |
-| overlay `v2.2.13` | Whether to show overlay | _boolean_ | `false` |
+| icon | Custom icon | _string_ | - |
+| iconPrefix | Icon className prefix | _string_ | `van-icon` |
+| overlay | Whether to show overlay | _boolean_ | `false` |
 | forbidClick | Whether to forbid click background | _boolean_ | `false` |
-| closeOnClick `v2.1.5` | Whether to close after clicked | _boolean_ | `false` |
-| closeOnClickOverlay `v2.2.13` | Whether to close when click overlay | _boolean_ | `false` |
+| closeOnClick | Whether to close after clicked | _boolean_ | `false` |
+| closeOnClickOverlay | Whether to close when overlay is clicked | _boolean_ | `false` |
 | loadingType | Loading icon type, can be set to `spinner` | _string_ | `circular` |
 | duration | Toast duration(ms), won't disappear if value is 0 | _number_ | `2000` |
-| className | Custom className | _any_ | - |
+| className | Custom className | _string \| Array \| object_ | - |
+| overlayClass `v3.0.4` | Custom overlay class | _string \| Array \| object_ | - |
+| overlayStyle `v3.0.4` | Custom overlay style | _object_ | - |
 | onOpened | Callback function after opened | _Function_ | - |
 | onClose | Callback function after close | _Function_ | - |
-| transition `v2.2.6` | Transition, equivalent to `name` prop of [transtion](https://vuejs.org/v2/api/#transition) | _string_ | `van-fade` |
-| getContainer | Return the mount node for Toast | _string \| () => Element_ | `body` |
+| transition | Transition, equivalent to `name` prop of [transtion](https://v3.vuejs.org/api/built-in-components.html#transition) | _string_ | `van-fade` |
+| teleport | Return the mount node for Toast | _string \| Element_ | `body` |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name                            | Default Value             | Description |
+| ------------------------------- | ------------------------- | ----------- |
+| @toast-max-width                | `70%`                     | -           |
+| @toast-font-size                | `@font-size-md`           | -           |
+| @toast-text-color               | `@white`                  | -           |
+| @toast-loading-icon-color       | `@white`                  | -           |
+| @toast-line-height              | `@line-height-md`         | -           |
+| @toast-border-radius            | `@border-radius-lg`       | -           |
+| @toast-background-color         | `fade(@black, 70%)`       | -           |
+| @toast-icon-size                | `36px`                    | -           |
+| @toast-text-min-width           | `96px`                    | -           |
+| @toast-text-padding             | `@padding-xs @padding-sm` | -           |
+| @toast-default-padding          | `@padding-md`             | -           |
+| @toast-default-width            | `88px`                    | -           |
+| @toast-default-min-height       | `88px`                    | -           |
+| @toast-position-top-distance    | `20%`                     | -           |
+| @toast-position-bottom-distance | `20%`                     | -           |

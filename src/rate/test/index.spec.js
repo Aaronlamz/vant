@@ -11,100 +11,79 @@ function mockGetBoundingClientRect(items) {
   });
 }
 
-test('change event', () => {
-  const onInput = jest.fn();
-  const onChange = jest.fn();
-
-  const wrapper = mount(Rate, {
-    listeners: {
-      input: (value) => {
-        onInput(value);
-        wrapper.setProps({ value });
-      },
-      change: onChange,
-    },
-  });
-  const item4 = wrapper.findAll('.van-rate__icon').at(3);
+test('should emit change and update:modelValue event when rate icon is clicked', async () => {
+  const wrapper = mount(Rate);
+  const item4 = wrapper.findAll('.van-rate__icon')[3];
 
   item4.trigger('click');
-  item4.trigger('click');
+  expect(wrapper.emitted('change').length).toEqual(1);
+  expect(wrapper.emitted('change')[0][0]).toEqual(4);
+  expect(wrapper.emitted('update:modelValue').length).toEqual(1);
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual(4);
 
-  expect(onInput).toHaveBeenCalledWith(4);
-  expect(onInput).toHaveBeenCalledTimes(1);
-  expect(onChange).toHaveBeenCalledWith(4);
-  expect(onChange).toHaveBeenCalledTimes(1);
+  await wrapper.setProps({ modelValue: 4 });
+  item4.trigger('click');
+  expect(wrapper.emitted('change').length).toEqual(1);
+  expect(wrapper.emitted('update:modelValue').length).toEqual(1);
 });
 
-test('allow half', () => {
-  const onInput = jest.fn();
-  const onChange = jest.fn();
-
+test('should not emit change and update:modelValue event when rate is not changed', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
+      modelValue: 4,
+    },
+  });
+
+  const item4 = wrapper.findAll('.van-rate__icon')[3];
+  item4.trigger('click');
+  expect(wrapper.emitted('change')).toBeFalsy();
+  expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+});
+
+test('should allow half rate when using allow-half prop', () => {
+  const wrapper = mount(Rate, {
+    props: {
       allowHalf: true,
     },
-    listeners: {
-      input: onInput,
-      change: onChange,
-    },
   });
-  const item4 = wrapper.findAll('.van-rate__icon--half').at(3);
 
+  const item4 = wrapper.findAll('.van-rate__icon--half')[3];
   item4.trigger('click');
-  expect(onInput).toHaveBeenCalledWith(3.5);
-  expect(onChange).toHaveBeenCalledWith(3.5);
+  expect(wrapper.emitted('change')[0][0]).toEqual(3.5);
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual(3.5);
 });
 
-test('disabled', () => {
-  const onInput = jest.fn();
-  const onChange = jest.fn();
-
+test('should not emit change or update:modelValue event when rate is disabled', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
       disabled: true,
     },
-    listeners: {
-      input: onInput,
-      change: onChange,
-    },
   });
-  const item4 = wrapper.findAll('.van-rate__item').at(3);
 
+  const item4 = wrapper.findAll('.van-rate__item')[3];
   triggerDrag(wrapper, 100, 0);
   item4.trigger('click');
 
-  expect(onInput).toHaveBeenCalledTimes(0);
-  expect(onChange).toHaveBeenCalledTimes(0);
+  expect(wrapper.emitted('change')).toBeFalsy();
+  expect(wrapper.emitted('update:modelValue')).toBeFalsy();
 });
 
-test('touchmove to select item', () => {
-  const onChange = jest.fn();
-  const wrapper = mount(Rate, {
-    listeners: {
-      change: onChange,
-    },
-  });
+test('should emit change event when rate icon is touchmoved', () => {
+  const wrapper = mount(Rate);
 
   const icons = wrapper.findAll('.van-rate__item');
-
   mockGetBoundingClientRect(icons);
   triggerDrag(wrapper, 100, 0);
 
-  expect(onChange).toHaveBeenNthCalledWith(1, 1);
-  expect(onChange).toHaveBeenNthCalledWith(2, 2);
-  expect(onChange).toHaveBeenNthCalledWith(3, 2);
-  expect(onChange).toHaveBeenNthCalledWith(4, 4);
+  const onChange = wrapper.emitted('change');
+  expect(onChange).toEqual([[1], [2], [2], [4]]);
 });
 
-test('touchmove to select half item', () => {
-  const onChange = jest.fn();
+test('should emit change event when rate icon is touchmoved and using allow-half prop', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
       allowHalf: true,
     },
-    listeners: {
-      change: onChange,
-    },
   });
 
   const icons = wrapper.findAll('.van-rate__item');
@@ -112,43 +91,39 @@ test('touchmove to select half item', () => {
   mockGetBoundingClientRect(icons);
   triggerDrag(wrapper, 100, 0);
 
-  expect(onChange).toHaveBeenNthCalledWith(1, 1);
-  expect(onChange).toHaveBeenNthCalledWith(2, 1.5);
-  expect(onChange).toHaveBeenNthCalledWith(3, 2);
-  expect(onChange).toHaveBeenNthCalledWith(4, 4);
+  const onChange = wrapper.emitted('change');
+  expect(onChange).toEqual([[1], [1.5], [2], [4]]);
 });
 
-test('gutter prop', () => {
+test('should render gutter when using gutter prop', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
       gutter: 10,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('size prop', () => {
+test('should change icon size when using size prop', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
       size: '2rem',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-rate__icon').element.style.fontSize).toEqual(
+    '2rem'
+  );
 });
 
-test('untouchable', () => {
-  const onChange = jest.fn();
+test('should not emit change event when untouchable rate is touchmoved', () => {
   const wrapper = mount(Rate, {
-    propsData: {
+    props: {
       touchable: false,
-    },
-    listeners: {
-      change: onChange,
     },
   });
 
   triggerDrag(wrapper, 100, 0);
-  expect(onChange).toHaveBeenCalledTimes(0);
+  expect(wrapper.emitted('change')).toBeFalsy();
 });

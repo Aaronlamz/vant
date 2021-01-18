@@ -1,12 +1,17 @@
 # PullRefresh 下拉刷新
 
+### 介绍
+
+用于提供下拉刷新的交互操作。
+
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { PullRefresh } from 'vant';
 
-Vue.use(PullRefresh);
+const app = createApp();
+app.use(PullRefresh);
 ```
 
 ## 代码演示
@@ -16,36 +21,40 @@ Vue.use(PullRefresh);
 下拉刷新时会触发 `refresh` 事件，在事件的回调函数中可以进行同步或异步操作，操作完成后将 `v-model` 设置为 `false`，表示加载完成。
 
 ```html
-<van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-  <p>刷新次数: {{ count }}</p>
+<van-pull-refresh v-model="state.loading" @refresh="onRefresh">
+  <p>刷新次数: {{ state.count }}</p>
 </van-pull-refresh>
 ```
 
 ```js
+import { reactive } from 'vue';
 import { Toast } from 'vant';
 
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       count: 0,
-      isLoading: false,
-    };
-  },
-  methods: {
-    onRefresh() {
+      loading: false,
+    });
+    const onRefresh = () => {
       setTimeout(() => {
         Toast('刷新成功');
-        this.isLoading = false;
-        this.count++;
+        state.loading = false;
+        state.count++;
       }, 1000);
-    },
+    };
+
+    return {
+      state,
+      onRefresh,
+    };
   },
 };
 ```
 
 ### 成功提示
 
-通过`success-text`可以设置刷新成功后的顶部提示文案
+通过 `success-text` 可以设置刷新成功后的顶部提示文案。
 
 ```html
 <van-pull-refresh
@@ -59,7 +68,7 @@ export default {
 
 ### 自定义提示
 
-通过插槽可以自定义下拉刷新过程中的提示内容
+通过插槽可以自定义下拉刷新过程中的提示内容。
 
 ```html
 <van-pull-refresh v-model="isLoading" :head-height="80" @refresh="onRefresh">
@@ -107,7 +116,7 @@ export default {
 | success-text | 刷新成功提示文案 | _string_ | - |
 | success-duration | 刷新成功提示展示时长(ms) | _number \| string_ | `500` |
 | animation-duration | 动画时长 | _number \| string_ | `300` |
-| head-height `v2.4.2` | 顶部内容高度 | _number \| string_ | `50` |
+| head-height | 顶部内容高度 | _number \| string_ | `50` |
 | disabled | 是否禁用下拉刷新 | _boolean_ | `false` |
 
 ### Events
@@ -118,7 +127,7 @@ export default {
 
 ### Slots
 
-| 名称    | 说明                 | SlotProps                  |
+| 名称    | 说明                 | 参数                       |
 | ------- | -------------------- | -------------------------- |
 | default | 自定义内容           | -                          |
 | normal  | 非下拉状态时顶部内容 | -                          |
@@ -127,8 +136,26 @@ export default {
 | loading | 加载过程中顶部内容   | { distance: 当前下拉距离 } |
 | success | 刷新成功提示内容     | -                          |
 
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                          | 默认值          | 描述 |
+| ----------------------------- | --------------- | ---- |
+| @pull-refresh-head-height     | `50px`          | -    |
+| @pull-refresh-head-font-size  | `@font-size-md` | -    |
+| @pull-refresh-head-text-color | `@gray-6`       | -    |
+
 ## 常见问题
+
+### PullReresh 的内容未填满屏幕时，只有一部分区域可以下拉？
+
+默认情况下，下拉区域的高度是和内容高度保持一致的，如果需要让下拉区域始终为全屏，可以给 PullRefresh 设置一个与屏幕大小相等的最小高度：
+
+```html
+<van-pull-refresh style="min-height: 100vh;" />
+```
 
 ### 在桌面端无法操作组件？
 
-参见[在桌面端使用](#/zh-CN/quickstart#zai-zhuo-mian-duan-shi-yong)。
+参见[桌面端适配](#/zh-CN/advanced-usage#zhuo-mian-duan-gua-pei)。

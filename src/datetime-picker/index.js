@@ -1,8 +1,13 @@
-import { createNamespace } from '../utils';
+import { ref } from 'vue';
+import { pick, createNamespace } from '../utils';
+import { useExpose } from '../composables/use-expose';
 import TimePicker from './TimePicker';
 import DatePicker from './DatePicker';
 
 const [createComponent, bem] = createNamespace('datetime-picker');
+
+const timePickerProps = Object.keys(TimePicker.props);
+const datePickerProps = Object.keys(DatePicker.props);
 
 export default createComponent({
   props: {
@@ -10,25 +15,29 @@ export default createComponent({
     ...DatePicker.props,
   },
 
-  methods: {
-    // @exposed-api
-    getPicker() {
-      return this.$refs.root.getPicker();
-    },
-  },
+  setup(props, { attrs, slots }) {
+    const root = ref();
 
-  render() {
-    const Component = this.type === 'time' ? TimePicker : DatePicker;
+    useExpose({
+      getPicker: () => root.value?.getPicker(),
+    });
 
-    return (
-      <Component
-        ref="root"
-        class={bem()}
-        {...{
-          props: this.$props,
-          on: this.$listeners,
-        }}
-      />
-    );
+    return () => {
+      const isTimePicker = props.type === 'time';
+      const Component = isTimePicker ? TimePicker : DatePicker;
+      const inheritProps = pick(
+        props,
+        isTimePicker ? timePickerProps : datePickerProps
+      );
+
+      return (
+        <Component
+          v-slots={slots}
+          ref={root}
+          class={bem()}
+          {...{ ...inheritProps, ...attrs }}
+        />
+      );
+    };
   },
 });

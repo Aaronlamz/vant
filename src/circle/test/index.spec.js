@@ -1,59 +1,49 @@
-import Vue from 'vue';
 import Circle from '..';
 import { mount, later } from '../../../test';
 
-test('speed is 0', async () => {
+// TODO
+// test('should update to final rate immediately if speed is 0', async () => {
+//   const wrapper = mount(Circle, {
+//     props: {
+//       rate: 50,
+//       currentRate: 0,
+//     },
+//   });
+
+//   await later();
+//   expect(wrapper.emitted('update:currentRate')).toBeTruthy();
+// });
+
+test('should emit "update:currentRate" event during animation', async () => {
   const wrapper = mount(Circle, {
-    propsData: {
-      rate: 50,
-      value: 0,
-    },
-    listeners: {
-      input(value) {
-        Vue.nextTick(() => {
-          wrapper.setProps({ value });
-        });
-      },
-    },
-  });
-
-  await later();
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('animate', async () => {
-  const onInput = jest.fn();
-  mount(Circle, {
-    propsData: {
+    props: {
       rate: 50,
       speed: 100,
     },
-    listeners: {
-      input: onInput,
-    },
   });
 
+  expect(wrapper.emitted('update:currentRate')).toBeFalsy();
   await later(50);
-  expect(onInput).toHaveBeenCalled();
-  expect(onInput.mock.calls[0][0]).not.toEqual(0);
+  expect(wrapper.emitted('update:currentRate')).toBeTruthy();
 });
 
-test('size prop', () => {
+test('should change circle size when using size prop', () => {
   const wrapper = mount(Circle, {
-    propsData: {
+    props: {
       size: 100,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.element.style.width).toEqual('100px');
+  expect(wrapper.element.style.height).toEqual('100px');
 });
 
-test('stroke-linecap prop', () => {
+test('should change stroke linecap when using stroke-linecap prop', () => {
   const wrapper = mount(Circle, {
-    propsData: {
+    props: {
       strokeLinecap: 'square',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });

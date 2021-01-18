@@ -1,3 +1,4 @@
+import glob from 'fast-glob';
 import chalk from 'chalk';
 import consola from 'consola';
 import { join } from 'path';
@@ -5,8 +6,22 @@ import { CWD, GENERATOR_DIR } from './constant';
 import Yeoman from 'yeoman-environment';
 import Generator from 'yeoman-generator';
 
-const TEMPLATES = join(GENERATOR_DIR, 'templates');
 const PROMPTS = [
+  {
+    name: 'vueVersion',
+    message: 'Select Vue version',
+    type: 'list',
+    choices: [
+      {
+        name: 'Vue 2',
+        value: 'vue2',
+      },
+      {
+        name: 'Vue 3',
+        value: 'vue3',
+      },
+    ],
+  },
   {
     name: 'preprocessor',
     message: 'Select css preprocessor',
@@ -19,6 +34,7 @@ export class VanGenerator extends Generator {
   inputs = {
     name: '',
     cssLang: '',
+    vueVersion: '',
     preprocessor: '',
   };
 
@@ -34,11 +50,12 @@ export class VanGenerator extends Generator {
   }
 
   async prompting() {
-    return this.prompt<Record<string, string>>(PROMPTS).then(inputs => {
+    return this.prompt<Record<string, string>>(PROMPTS).then((inputs) => {
       const preprocessor = inputs.preprocessor.toLowerCase();
       const cssLang = preprocessor === 'sass' ? 'scss' : preprocessor;
 
       this.inputs.cssLang = cssLang;
+      this.inputs.vueVersion = inputs.vueVersion;
       this.inputs.preprocessor = preprocessor;
     });
   }
@@ -46,25 +63,18 @@ export class VanGenerator extends Generator {
   writing() {
     consola.info(`Creating project in ${join(CWD, this.inputs.name)}\n`);
 
-    const copy = (from: string, to?: string) => {
-      this.fs.copy(join(TEMPLATES, from), this.destinationPath(to || from));
-    };
+    const templatePath = join(GENERATOR_DIR, this.inputs.vueVersion);
+    const templateFiles = glob.sync(join(templatePath, '**', '*'), {
+      dot: true,
+    });
+    const destinationRoot = this.destinationRoot();
 
-    const copyTpl = (from: string, to?: string) => {
-      this.fs.copyTpl(
-        join(TEMPLATES, from),
-        this.destinationPath(to || from),
-        this.inputs
-      );
-    };
-
-    copyTpl('package.json.tpl', 'package.json');
-    copyTpl('vant.config.js');
-    copyTpl('src/**/*', 'src');
-    copyTpl('docs/**/*', 'docs');
-    copy('babel.config.js');
-    copy('gitignore.tpl', '.gitignore');
-    copy('eslintignore.tpl', '.eslintignore');
+    templateFiles.forEach((filePath) => {
+      const outputPath = filePath
+        .replace('.tpl', '')
+        .replace(templatePath, destinationRoot);
+      this.fs.copyTpl(filePath, outputPath, this.inputs);
+    });
   }
 
   install() {

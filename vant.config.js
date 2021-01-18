@@ -1,9 +1,12 @@
 module.exports = {
   name: 'vant',
   build: {
+    srcDir: 'src',
     skipInstall: ['lazyload'],
     site: {
-      publicPath: 'https://b.yzcdn.cn/vant/',
+      publicPath:
+        (typeof window === 'undefined' && process.env.PUBLIC_PATH) ||
+        'https://b.yzcdn.cn/vant/',
     },
     vetur: {
       tagPrefix: 'van-',
@@ -11,21 +14,26 @@ module.exports = {
   },
   site: {
     defaultLang: 'en-US',
-    versions: [{ label: '1.x', link: 'https://youzan.github.io/vant/1.x/' }],
+    versions: [
+      { label: 'Vant v1', link: '/vant/v1/' },
+      { label: 'Vant v2', link: '/vant/' },
+      { label: 'Vant Weapp', link: '/vant-weapp/' },
+    ],
     baiduAnalytics: {
       seed: 'ad6b5732c36321f2dafed737ac2da92f',
+    },
+    htmlPluginOptions: {
+      meta: {
+        'docsearch:version': 'v3',
+      },
     },
     locales: {
       'zh-CN': {
         title: 'Vant',
         description: '轻量、可靠的移动端 Vue 组件库',
         logo: 'https://img.yzcdn.cn/vant/logo.png',
-        langLabel: '中文',
+        langLabel: '中',
         links: [
-          {
-            logo: 'https://b.yzcdn.cn/vant/logo/weapp.svg',
-            url: '/vant-weapp',
-          },
           {
             logo: 'https://b.yzcdn.cn/vant/logo/github.svg',
             url: 'https://github.com/youzan/vant',
@@ -34,7 +42,21 @@ module.exports = {
         searchConfig: {
           apiKey: '90067aecdaa2c85220e2783cd305caac',
           indexName: 'vant',
-          placeholder: '搜索文档...',
+          searchParameters: {
+            facetFilters: ['lang:zh-CN', 'version:v3'],
+          },
+          transformItems(items) {
+            if (location.hostname !== 'youzan.github.io') {
+              items.forEach((item) => {
+                if (item.url) {
+                  item.url =
+                    item.url &&
+                    item.url.replace('youzan.github.io', location.hostname);
+                }
+              });
+            }
+            return items;
+          },
         },
         nav: [
           {
@@ -49,8 +71,16 @@ module.exports = {
                 title: '快速上手',
               },
               {
-                path: 'changelog',
+                path: 'advanced-usage',
+                title: '进阶用法',
+              },
+              {
+                path: 'changelog-v3',
                 title: '更新日志',
+              },
+              {
+                path: 'migrate-from-v2',
+                title: '从 v2 升级',
               },
               {
                 path: 'theme',
@@ -117,6 +147,10 @@ module.exports = {
               {
                 path: 'calendar',
                 title: 'Calendar 日历',
+              },
+              {
+                path: 'cascader',
+                title: 'Cascader 级联选择',
               },
               {
                 path: 'checkbox',
@@ -221,6 +255,10 @@ module.exports = {
             title: '展示组件',
             items: [
               {
+                path: 'badge',
+                title: 'Badge 徽标',
+              },
+              {
                 path: 'circle',
                 title: 'Circle 环形进度条',
               },
@@ -257,6 +295,10 @@ module.exports = {
                 title: 'NoticeBar 通知栏',
               },
               {
+                path: 'popover',
+                title: 'Popover 气泡弹出框',
+              },
+              {
                 path: 'progress',
                 title: 'Progress 进度条',
               },
@@ -278,13 +320,17 @@ module.exports = {
               },
               {
                 path: 'tag',
-                title: 'Tag 标记',
+                title: 'Tag 标签',
               },
             ],
           },
           {
             title: '导航组件',
             items: [
+              {
+                path: 'action-bar',
+                title: 'ActionBar 动作栏',
+              },
               {
                 path: 'grid',
                 title: 'Grid 宫格',
@@ -340,36 +386,23 @@ module.exports = {
               },
               {
                 path: 'contact-card',
-                title: 'Contact 联系人',
+                title: 'ContactCard 联系人卡片',
+              },
+              {
+                path: 'contact-edit',
+                title: 'ContactEdit 联系人编辑',
+              },
+              {
+                path: 'contact-list',
+                title: 'ContactList 联系人列表',
               },
               {
                 path: 'coupon-list',
                 title: 'Coupon 优惠券',
               },
               {
-                path: 'goods-action',
-                title: 'GoodsAction 商品导航',
-              },
-              {
                 path: 'submit-bar',
                 title: 'SubmitBar 提交订单栏',
-              },
-              {
-                path: 'sku',
-                title: 'Sku 商品规格',
-              },
-            ],
-          },
-          {
-            title: '废弃',
-            items: [
-              {
-                path: 'panel',
-                title: 'Panel 面板',
-              },
-              {
-                path: 'switch-cell',
-                title: 'SwitchCell 开关单元格',
               },
             ],
           },
@@ -379,12 +412,8 @@ module.exports = {
         title: 'Vant',
         description: 'Mobile UI Components built on Vue',
         logo: 'https://img.yzcdn.cn/vant/logo.png',
-        langLabel: 'En',
+        langLabel: 'EN',
         links: [
-          {
-            logo: 'https://b.yzcdn.cn/vant/logo/weapp.svg',
-            url: '/vant-weapp',
-          },
           {
             logo: 'https://b.yzcdn.cn/vant/logo/github.svg',
             url: 'https://github.com/youzan/vant',
@@ -393,7 +422,9 @@ module.exports = {
         searchConfig: {
           apiKey: '90067aecdaa2c85220e2783cd305caac',
           indexName: 'vant',
-          placeholder: 'Search...',
+          searchParameters: {
+            facetFilters: ['lang:en-US', 'version:v3'],
+          },
         },
         nav: [
           {
@@ -408,7 +439,11 @@ module.exports = {
                 title: 'Quickstart',
               },
               {
-                path: 'changelog',
+                path: 'advanced-usage',
+                title: 'Advanced Usage',
+              },
+              {
+                path: 'changelog-v3',
                 title: 'Changelog',
               },
               {
@@ -466,6 +501,10 @@ module.exports = {
                 title: 'Calendar',
               },
               {
+                path: 'cascader',
+                title: 'Cascader',
+              },
+              {
                 path: 'checkbox',
                 title: 'Checkbox',
               },
@@ -518,10 +557,6 @@ module.exports = {
                 title: 'Switch',
               },
               {
-                path: 'switch-cell',
-                title: 'SwitchCell',
-              },
-              {
                 path: 'uploader',
                 title: 'Uploader',
               },
@@ -572,6 +607,10 @@ module.exports = {
             title: 'Display Components',
             items: [
               {
+                path: 'badge',
+                title: 'Badge',
+              },
+              {
                 path: 'circle',
                 title: 'Circle',
               },
@@ -608,6 +647,10 @@ module.exports = {
                 title: 'NoticeBar',
               },
               {
+                path: 'popover',
+                title: 'Popover',
+              },
+              {
                 path: 'progress',
                 title: 'Progress',
               },
@@ -636,6 +679,10 @@ module.exports = {
           {
             title: 'Navigation Components',
             items: [
+              {
+                path: 'action-bar',
+                title: 'ActionBar',
+              },
               {
                 path: 'grid',
                 title: 'Grid',
@@ -691,36 +738,23 @@ module.exports = {
               },
               {
                 path: 'contact-card',
-                title: 'Contact',
+                title: 'ContactCard',
+              },
+              {
+                path: 'contact-edit',
+                title: 'ContactEdit',
+              },
+              {
+                path: 'contact-list',
+                title: 'ContactList',
               },
               {
                 path: 'coupon-list',
                 title: 'Coupon',
               },
               {
-                path: 'goods-action',
-                title: 'GoodsAction',
-              },
-              {
                 path: 'submit-bar',
                 title: 'SubmitBar',
-              },
-              {
-                path: 'sku',
-                title: 'Sku',
-              },
-            ],
-          },
-          {
-            title: 'Deprecated',
-            items: [
-              {
-                path: 'panel',
-                title: 'Panel',
-              },
-              {
-                path: 'switch-cell',
-                title: 'SwitchCell',
               },
             ],
           },

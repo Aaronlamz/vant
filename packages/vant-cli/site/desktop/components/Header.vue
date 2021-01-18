@@ -7,20 +7,17 @@
           <span>{{ config.title }}</span>
         </a>
 
-        <search-input
-          v-if="searchConfig"
-          :lang="lang"
-          :search-config="searchConfig"
-        />
-
         <ul class="van-doc-header__top-nav">
-          <li v-for="item in config.links" class="van-doc-header__top-nav-item">
-            <a
-              class="van-doc-header__logo-link"
-              target="_blank"
-              :href="item.url"
-            >
-              <img :src="item.logo" />
+          <li
+            v-for="(item, index) in config.links"
+            :key="index"
+            class="van-doc-header__top-nav-item"
+          >
+            <a class="van-doc-header__link" target="_blank" :href="item.url">
+              <img v-if="item.logo" :src="item.logo" />
+              <span v-else-if="item.text">
+                {{ item.text }}
+              </span>
             </a>
           </li>
 
@@ -33,11 +30,12 @@
               class="van-doc-header__cube van-doc-header__version"
               @click="toggleVersionPop"
             >
-              {{ versions[0].label }}
+              {{ packageVersion }}
               <transition name="van-doc-dropdown">
                 <div v-if="showVersionPop" class="van-doc-header__version-pop">
                   <div
-                    v-for="item in versions"
+                    v-for="(item, index) in versions"
+                    :key="index"
                     class="van-doc-header__version-pop-item"
                     @click="onSwitchVersion(item)"
                   >
@@ -49,8 +47,16 @@
           </li>
 
           <li v-if="langLabel && langLink" class="van-doc-header__top-nav-item">
-            <a class="van-doc-header__cube" :href="langLink">{{ langLabel }}</a>
+            <a class="van-doc-header__cube" :href="langLink">
+              {{ langLabel }}
+            </a>
           </li>
+
+          <search-input
+            v-if="searchConfig"
+            :lang="lang"
+            :search-config="searchConfig"
+          />
         </ul>
       </div>
     </div>
@@ -59,9 +65,10 @@
 
 <script>
 import SearchInput from './SearchInput';
+import { packageVersion } from 'site-desktop-shared';
 
 export default {
-  name: 'van-doc-header',
+  name: 'VanDocHeader',
 
   components: {
     SearchInput,
@@ -76,6 +83,7 @@ export default {
 
   data() {
     return {
+      packageVersion,
       showVersionPop: false,
     };
   },
@@ -90,7 +98,7 @@ export default {
     },
 
     anotherLang() {
-      const items = this.langConfigs.filter(item => item.lang !== this.lang);
+      const items = this.langConfigs.filter((item) => item.lang !== this.lang);
       if (items.length) {
         return items[0];
       }
@@ -148,7 +156,6 @@ export default {
     align-items: center;
     height: @van-doc-header-top-height;
     padding: 0 @van-doc-padding;
-    line-height: @van-doc-header-top-height;
 
     &-nav {
       flex: 1;
@@ -162,7 +169,7 @@ export default {
       }
 
       &-item {
-        margin-left: 20px;
+        margin-left: 16px;
       }
 
       &-title {
@@ -176,10 +183,10 @@ export default {
     position: relative;
     display: block;
     padding: 0 12px;
-    color: #fff;
+    color: #001938;
+    background: #f7f8fa;
     font-size: 14px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    line-height: 24px;
+    line-height: 30px;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.7);
     border-radius: 20px;
@@ -192,11 +199,11 @@ export default {
 
     &::after {
       position: absolute;
-      top: 7px;
-      right: 7px;
+      top: 10px;
+      right: 9px;
       width: 5px;
       height: 5px;
-      color: rgba(255, 255, 255, 0.9);
+      color: #001938;
       border: 1px solid;
       border-color: transparent transparent currentColor currentColor;
       transform: rotate(-45deg);
@@ -205,15 +212,16 @@ export default {
 
     &-pop {
       position: absolute;
-      top: 30px;
-      right: 0;
+      top: 34px;
       left: 0;
+      width: 100px;
       z-index: 99;
       color: #333;
       line-height: 36px;
       text-align: left;
+      overflow: hidden;
       background-color: #fff;
-      border-radius: @van-doc-border-radius;
+      border-radius: 8px;
       box-shadow: 0 4px 12px #ebedf0;
       transform-origin: top;
       transition: 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -224,6 +232,7 @@ export default {
 
         &:hover {
           color: @van-doc-blue;
+          background-color: #f7f8fa;
         }
       }
     }
@@ -239,8 +248,8 @@ export default {
     }
 
     img {
-      width: 24px;
-      margin-right: 10px;
+      width: 28px;
+      margin-right: 12px;
     }
 
     span {
@@ -249,11 +258,16 @@ export default {
     }
   }
 
-  &__logo-link {
+  &__link {
+    span {
+      color: #fff;
+      font-size: 16px;
+    }
+
     img {
       display: block;
-      width: 26px;
-      height: 26px;
+      width: 30px;
+      height: 30px;
       transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
       &:hover {

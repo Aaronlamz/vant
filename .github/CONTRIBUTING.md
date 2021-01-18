@@ -29,21 +29,9 @@ It's welcomed to pull request, And there are some tips about that:
 ```bash
 git clone git@github.com:youzan/vant.git
 
-cd vant
-
-npm run bootstrap
+cd vant && yarn
 
 npm run dev
 
 # open http://localhost:8080
 ```
-
-## Contribute online with a single click
-
-You can use Gitpod (A free online VS Code-like IDE) for contributing, With a single click it will launch a workspace and automatically:
-
-- clone the vant repo.
-- run `npm run bootstrap`.
-- run `npm run dev`. 
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/youzan/vant)

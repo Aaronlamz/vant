@@ -1,65 +1,90 @@
+import { ref, reactive, computed, onMounted } from 'vue';
+
+// Utils
 import { createNamespace } from '../utils';
-import { ChildrenMixin } from '../mixins/relation';
 import { BORDER_BOTTOM } from '../utils/constant';
+import { INDEX_BAR_KEY } from '../index-bar';
+import { getScrollTop, getRootScrollTop } from '../utils/dom/scroll';
+
+// Composition
+import { useRect, useParent } from '@vant/use';
+import { useHeight } from '../composables/use-height';
+import { useExpose } from '../composables/use-expose';
 
 const [createComponent, bem] = createNamespace('index-anchor');
 
 export default createComponent({
-  mixins: [ChildrenMixin('vanIndexBar', { indexKey: 'childrenIndex' })],
-
   props: {
     index: [Number, String],
   },
 
-  data() {
-    return {
+  setup(props, { slots }) {
+    const state = reactive({
       top: 0,
       left: null,
+      rect: { top: 0, height: 0 },
       width: null,
       active: false,
-    };
-  },
+    });
 
-  computed: {
-    sticky() {
-      return this.active && this.parent.sticky;
-    },
+    const root = ref();
+    const { parent } = useParent(INDEX_BAR_KEY);
 
-    anchorStyle() {
-      if (this.sticky) {
+    const isSticky = () => state.active && parent.props.sticky;
+
+    const anchorStyle = computed(() => {
+      const { zIndex, highlightColor } = parent.props;
+
+      if (isSticky()) {
         return {
-          zIndex: `${this.parent.zIndex}`,
-          left: this.left ? `${this.left}px` : null,
-          width: this.width ? `${this.width}px` : null,
-          transform: `translate3d(0, ${this.top}px, 0)`,
-          color: this.parent.highlightColor,
+          zIndex: `${zIndex}`,
+          left: state.left ? `${state.left}px` : null,
+          width: state.width ? `${state.width}px` : null,
+          transform: state.top ? `translate3d(0, ${state.top}px, 0)` : null,
+          color: highlightColor,
         };
       }
-    },
-  },
+    });
 
-  mounted() {
-    this.height = this.$el.offsetHeight;
-  },
+    const getRect = (scrollParent, scrollParentRect) => {
+      const rootRect = useRect(root);
+      state.rect.height = rootRect.height;
 
-  methods: {
-    scrollIntoView() {
-      this.$el.scrollIntoView();
-    },
-  },
+      if (scrollParent === window || scrollParent === document.body) {
+        state.rect.top = rootRect.top + getRootScrollTop();
+      } else {
+        state.rect.top =
+          rootRect.top + getScrollTop(scrollParent) - scrollParentRect.top;
+      }
 
-  render() {
-    const { sticky } = this;
+      return state.rect;
+    };
 
-    return (
-      <div style={{ height: sticky ? `${this.height}px` : null }}>
+    onMounted(() => {
+      state.rect.height = useHeight(root);
+    });
+
+    useExpose({
+      state,
+      getRect,
+    });
+
+    return () => {
+      const sticky = isSticky();
+
+      return (
         <div
-          style={this.anchorStyle}
-          class={[bem({ sticky }), { [BORDER_BOTTOM]: sticky }]}
+          ref={root}
+          style={{ height: sticky ? `${state.rect.height}px` : null }}
         >
-          {this.slots('default') || this.index}
+          <div
+            style={anchorStyle.value}
+            class={[bem({ sticky }), { [BORDER_BOTTOM]: sticky }]}
+          >
+            {slots.default ? slots.default() : props.index}
+          </div>
         </div>
-      </div>
-    );
+      );
+    };
   },
 });

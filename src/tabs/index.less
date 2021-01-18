@@ -10,6 +10,7 @@
   padding: 0 @padding-base;
   color: @tab-text-color;
   font-size: @tab-font-size;
+  line-height: @tab-line-height;
   cursor: pointer;
 
   &--active {
@@ -30,10 +31,6 @@
       -webkit-box-orient: vertical;
     }
   }
-
-  &__text-wrapper {
-    position: relative;
-  }
 }
 
 .van-tabs {
@@ -53,11 +50,8 @@
 
     &--scrollable {
       .van-tab {
-        flex: 0 0 22%;
-
-        &--complete {
-          flex: 1 0 auto;
-        }
+        flex: 1 0 auto;
+        padding: 0 @padding-sm;
       }
 
       .van-tabs__nav {
@@ -82,6 +76,11 @@
       box-sizing: content-box;
       height: 100%;
       padding-bottom: 15px; /* 15px padding to hide scrollbar in mobile safari */
+    }
+
+    &--complete {
+      padding-right: @padding-xs;
+      padding-left: @padding-xs;
     }
 
     &--card {
@@ -116,6 +115,7 @@
     bottom: 15px;
     left: 0;
     z-index: 1;
+    width: @tabs-bottom-bar-width;
     height: @tabs-bottom-bar-height;
     background-color: @tabs-bottom-bar-color;
     border-radius: @tabs-bottom-bar-height;

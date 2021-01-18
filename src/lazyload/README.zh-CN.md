@@ -2,16 +2,17 @@
 
 ### 引入
 
-`Lazyload` 是 `Vue` 指令，使用前需要对指令进行注册
+`Lazyload` 是 `Vue` 指令，使用前需要对指令进行注册。
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Lazyload } from 'vant';
 
-Vue.use(Lazyload);
+const app = createApp();
+app.use(Lazyload);
 
 // 注册时可以配置额外的选项
-Vue.use(Lazyload, {
+app.use(Lazyload, {
   lazyComponent: true,
 });
 ```
@@ -20,7 +21,7 @@ Vue.use(Lazyload, {
 
 ### 基础用法
 
-将`v-lazy`指令的值设置为你需要懒加载的图片
+将 `v-lazy` 指令的值设置为你需要懒加载的图片。
 
 ```html
 <img v-for="img in imageList" v-lazy="img" />
@@ -28,7 +29,7 @@ Vue.use(Lazyload, {
 
 ```js
 export default {
-  data() {
+  setup() {
     return {
       imageList: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
@@ -41,7 +42,7 @@ export default {
 
 ### 背景图懒加载
 
-和图片懒加载不同，背景图懒加载需要使用`v-lazy:background-image`，值设置为背景图片的地址，需要注意的是必须声明容器高度。
+和图片懒加载不同，背景图懒加载需要使用 `v-lazy:background-image`，值设置为背景图片的地址，需要注意的是必须声明容器高度。
 
 ```html
 <div v-for="img in imageList" v-lazy:background-image="img" />
@@ -49,11 +50,11 @@ export default {
 
 ### 组件懒加载
 
-将需要懒加载的组件放在`lazy-component`标签中，即可实现组件懒加载。
+将需要懒加载的组件放在 `lazy-component` 标签中，即可实现组件懒加载。
 
 ```js
 // 注册时设置`lazyComponent`选项
-Vue.use(Lazyload, {
+app.use(Lazyload, {
   lazyComponent: true,
 });
 ```

@@ -1,6 +1,6 @@
 {
   "name": "create-vant-cli-app",
-  "version": "0.1.3",
+  "version": "1.0.1",
   "description": "Create Vant Cli App",
   "main": "lib/index.js",
   "bin": {
@@ -21,6 +21,9 @@
   "keywords": [
     "vant"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "author": "chenjiahan",
   "license": "MIT",
   "devDependencies": {
@@ -33,6 +36,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "consola": "^2.11.3",
+    "fast-glob": "^3.2.4",
     "fs-extra": "^8.1.0",
     "inquirer": "^7.0.6",
     "yeoman-environment": "^2.8.0",

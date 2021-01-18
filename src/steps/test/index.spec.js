@@ -1,39 +1,34 @@
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
+import Step from '../../step';
+import Steps from '..';
 
-test('icon slot', () => {
+test('should render icon slot correctly', () => {
   const wrapper = mount({
-    template: `
-    <van-steps :active="1">
-      <van-step>
-        <template v-slot:inactive-icon>Custim Inactive Icon</template>
-        A
-      </van-step>
-      <van-step>
-        <template v-slot:active-icon>Custim Active Icon</template>
-        B
-      </van-step>
-      <van-step>
-        <template v-slot:inactive-icon>Custim Inactive Icon</template>
-        C
-      </van-step>
-    </van-steps>
-    `,
+    render() {
+      return (
+        <Steps active={0}>
+          <Step v-slots={{ 'active-icon': () => `Custim Active Icon` }}>B</Step>
+          <Step v-slots={{ 'inactive-icon': () => `Custim Inactive Icon` }}>
+            A
+          </Step>
+        </Steps>
+      );
+    },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('click-step event', () => {
+test('should emit click-step event when step is clicked', () => {
   const onClickStep = jest.fn();
   const wrapper = mount({
-    template: `
-      <van-steps :active="1" @click-step="onClickStep">
-        <van-step>A</van-step>
-        <van-step>B</van-step>
-        <van-step>C</van-step>
-      </van-steps>
-    `,
-    methods: {
-      onClickStep,
+    setup() {
+      return () => (
+        <Steps active={1} onClickStep={onClickStep}>
+          <Step>A</Step>
+          <Step>B</Step>
+          <Step>C</Step>
+        </Steps>
+      );
     },
   });
 
@@ -43,19 +38,35 @@ test('click-step event', () => {
   wrapper.find('.van-step__title').trigger('click');
   expect(onClickStep).toHaveBeenCalledWith(0);
 
-  wrapper.findAll('.van-step__circle-container').at(2).trigger('click');
+  wrapper.findAll('.van-step__circle-container')[2].trigger('click');
   expect(onClickStep).toHaveBeenCalledTimes(2);
   expect(onClickStep).toHaveBeenLastCalledWith(2);
 });
 
-test('inactive-color prop', () => {
+test('should change inactive color when using inactive-color prop', () => {
   const wrapper = mount({
-    template: `
-    <van-steps :active="0" inactive-color="red">
-      <van-step>A</van-step>
-      <van-step>B</van-step>
-    </van-steps>
-    `,
+    render() {
+      return (
+        <Steps active={0} inactiveColor="red">
+          <Step>A</Step>
+          <Step>B</Step>
+        </Steps>
+      );
+    },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should change inactive icon when using inactive-icon prop', () => {
+  const wrapper = mount({
+    render() {
+      return (
+        <Steps active={0} inactiveIcon="foo">
+          <Step>A</Step>
+          <Step>B</Step>
+        </Steps>
+      );
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
 });

@@ -7,10 +7,11 @@
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Field } from 'vant';
 
-Vue.use(Field);
+const app = createApp();
+app.use(Field);
 ```
 
 ## 代码演示
@@ -27,11 +28,12 @@ Vue.use(Field);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      value: '',
-    };
+  setup() {
+    const value = ref('');
+    return { value };
   },
 };
 ```
@@ -42,32 +44,34 @@ export default {
 
 ```html
 <!-- 输入任意文本 -->
-<van-field v-model="text" label="文本" />
+<van-field v-model="state.text" label="文本" />
 <!-- 输入手机号，调起手机号键盘 -->
-<van-field v-model="tel" type="tel" label="手机号" />
+<van-field v-model="state.tel" type="tel" label="手机号" />
 <!-- 允许输入正整数，调起纯数字键盘 -->
-<van-field v-model="digit" type="digit" label="整数" />
+<van-field v-model="state.digit" type="digit" label="整数" />
 <!-- 允许输入数字，调起带符号的纯数字键盘 -->
-<van-field v-model="number" type="number" label="数字" />
+<van-field v-model="state.number" type="number" label="数字" />
 <!-- 输入密码 -->
-<van-field v-model="password" type="password" label="密码" />
+<van-field v-model="state.password" type="password" label="密码" />
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       tel: '',
       text: '',
       digit: '',
       number: '',
       password: '',
-    };
+    });
+
+    return { state };
   },
 };
 ```
-
-> Tips: digit 类型从 2.4.2 版本开始支持
 
 ### 禁用输入框
 
@@ -87,14 +91,14 @@ export default {
 ```html
 <van-cell-group>
   <van-field
-    v-model="value1"
+    v-model="state.value1"
     label="文本"
     left-icon="smile-o"
     right-icon="warning-o"
     placeholder="显示图标"
   />
   <van-field
-    v-model="value2"
+    v-model="state.value2"
     clearable
     label="文本"
     left-icon="music-o"
@@ -104,12 +108,16 @@ export default {
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value1: '',
       value2: '123',
-    };
+    });
+
+    return { state };
   },
 };
 ```
@@ -161,13 +169,13 @@ export default {
 
 ```html
 <van-field
-  v-model="value1"
+  v-model="state.value1"
   label="文本"
   :formatter="formatter"
   placeholder="在输入时执行格式化"
 />
 <van-field
-  v-model="value2"
+  v-model="state.value2"
   label="文本"
   :formatter="formatter"
   format-trigger="onBlur"
@@ -176,18 +184,21 @@ export default {
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value1: '',
       value2: '',
+    });
+    // 过滤输入的数字
+    const formatter = (value) => value.replace(/\d/g, '');
+
+    return {
+      state,
+      formatter,
     };
-  },
-  methods: {
-    formatter(value) {
-      // 过滤输入的数字
-      return value.replace(/\d/g, '');
-    },
   },
 };
 ```
@@ -243,9 +254,9 @@ export default {
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| v-model (value) | 当前输入的值 | _number \| string_ | - |
+| v-model | 当前输入的值 | _number \| string_ | - |
 | label | 输入框左侧文本 | _string_ | - |
-| name `v2.5.0` | 名称，提交表单的标识符 | _string_ | - |
+| name | 名称，提交表单的标识符 | _string_ | - |
 | type | 输入框类型, 可选值为 `tel` `digit`<br>`number` `textarea` `password` 等 | _string_ | `text` |
 | size | 大小，可选值为 `large` | _string_ | - |
 | maxlength | 输入的最大字符数 | _number \| string_ | - |
@@ -253,21 +264,21 @@ export default {
 | border | 是否显示内边框 | _boolean_ | `true` |
 | disabled | 是否禁用输入框 | _boolean_ | `false` |
 | readonly | 是否只读 | _boolean_ | `false` |
-| colon `v2.7.2` | 是否在 label 后面添加冒号 | _boolean_ | `false` |
+| colon | 是否在 label 后面添加冒号 | _boolean_ | `false` |
 | required | 是否显示表单必填星号 | _boolean_ | `false` |
 | center | 是否使内容垂直居中 | _boolean_ | `false` |
 | clearable | 是否启用清除图标，点击清除图标后会清空输入框 | _boolean_ | `false` |
-| clear-trigger `v2.9.1` | 显示清除图标的时机，`always` 表示输入框不为空时展示，<br>`focus` 表示输入框聚焦且不为空时展示 | _string_ | `focus` |
+| clear-trigger | 显示清除图标的时机，`always` 表示输入框不为空时展示，<br>`focus` 表示输入框聚焦且不为空时展示 | _string_ | `focus` |
 | clickable | 是否开启点击反馈 | _boolean_ | `false` |
 | is-link | 是否展示右侧箭头并开启点击反馈 | _boolean_ | `false` |
 | autofocus | 是否自动聚焦，iOS 系统不支持该属性 | _boolean_ | `false` |
-| show-word-limit `v2.2.8` | 是否显示字数统计，需要设置`maxlength`属性 | _boolean_ | `false` |
+| show-word-limit | 是否显示字数统计，需要设置`maxlength`属性 | _boolean_ | `false` |
 | error | 是否将输入内容标红 | _boolean_ | `false` |
 | error-message | 底部错误提示文案，为空时不展示 | _string_ | - |
-| formatter `v2.4.2` | 输入内容格式化函数 | _Function_ | - |
-| format-trigger `v2.8.7` | 格式化函数触发的时机，可选值为 `onBlur` | _string_ | `onChange` |
-| arrow-direction `v2.0.4` | 箭头方向，可选值为 `left` `up` `down` | _string_ | `right` |
-| label-class | 左侧文本额外类名 | _any_ | - |
+| formatter | 输入内容格式化函数 | _Function_ | - |
+| format-trigger | 格式化函数触发的时机，可选值为 `onBlur` | _string_ | `onChange` |
+| arrow-direction | 箭头方向，可选值为 `left` `up` `down` | _string_ | `right` |
+| label-class | 左侧文本额外类名 | _string \| Array \| object_ | - |
 | label-width | 左侧文本宽度，默认单位为`px` | _number \| string_ | `6.2em` |
 | label-align | 左侧文本对齐方式，可选值为 `center` `right` | _string_ | `left` |
 | input-align | 输入框对齐方式，可选值为 `center` `right` | _string_ | `left` |
@@ -275,27 +286,26 @@ export default {
 | autosize | 是否自适应内容高度，只对 textarea 有效，<br>可传入对象,如 { maxHeight: 100, minHeight: 50 }，<br>单位为`px` | _boolean \| object_ | `false` |
 | left-icon | 左侧[图标名称](#/zh-CN/icon)或图片链接 | _string_ | - |
 | right-icon | 右侧[图标名称](#/zh-CN/icon)或图片链接 | _string_ | - |
-| icon-prefix `v2.5.3` | 图标类名前缀，同 Icon 组件的 [class-prefix 属性](#/zh-CN/icon#props) | _string_ | `van-icon` |
-| rules `v2.5.0` | 表单校验规则，详见 [Form 组件](#/zh-CN/form#rule-shu-ju-jie-gou) | _Rule[]_ | - |
+| icon-prefix | 图标类名前缀，同 Icon 组件的 [class-prefix 属性](#/zh-CN/icon#props) | _string_ | `van-icon` |
+| rules | 表单校验规则，详见 [Form 组件](#/zh-CN/form#rule-shu-ju-jie-gou) | _Rule[]_ | - |
+| autocomplete `v3.0.3` | input 标签原生的[自动完成属性](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete) | _string_ | - |
 
 ### Events
 
-除下列事件外，Field 默认支持 Input 标签所有的原生事件
-
-| 事件                 | 说明                 | 回调参数                       |
-| -------------------- | -------------------- | ------------------------------ |
-| input                | 输入框内容变化时触发 | _value: string (当前输入的值)_ |
-| focus                | 输入框获得焦点时触发 | _event: Event_                 |
-| blur                 | 输入框失去焦点时触发 | _event: Event_                 |
-| clear                | 点击清除按钮时触发   | _event: Event_                 |
-| click                | 点击 Field 时触发    | _event: Event_                 |
-| click-input `v2.8.1` | 点击输入区域时触发   | _event: Event_                 |
-| click-left-icon      | 点击左侧图标时触发   | _event: Event_                 |
-| click-right-icon     | 点击右侧图标时触发   | _event: Event_                 |
+| 事件               | 说明                 | 回调参数                       |
+| ------------------ | -------------------- | ------------------------------ |
+| update:model-value | 输入框内容变化时触发 | _value: string (当前输入的值)_ |
+| focus              | 输入框获得焦点时触发 | _event: Event_                 |
+| blur               | 输入框失去焦点时触发 | _event: Event_                 |
+| clear              | 点击清除按钮时触发   | _event: Event_                 |
+| click              | 点击 Field 时触发    | _event: Event_                 |
+| click-input        | 点击输入区域时触发   | _event: Event_                 |
+| click-left-icon    | 点击左侧图标时触发   | _event: Event_                 |
+| click-right-icon   | 点击右侧图标时触发   | _event: Event_                 |
 
 ### 方法
 
-通过 ref 可以获取到 Field 实例并调用实例方法，详见[组件实例方法](#/zh-CN/quickstart#zu-jian-shi-li-fang-fa)
+通过 ref 可以获取到 Field 实例并调用实例方法，详见[组件实例方法](#/zh-CN/advanced-usage#zu-jian-shi-li-fang-fa)。
 
 | 方法名 | 说明           | 参数 | 返回值 |
 | ------ | -------------- | ---- | ------ |
@@ -304,14 +314,39 @@ export default {
 
 ### Slots
 
-| 名称           | 说明                                                       |
-| -------------- | ---------------------------------------------------------- |
-| label          | 自定义输入框 label 标签                                    |
-| input          | 自定义输入框，使用此插槽后，与输入框相关的属性和事件将失效 |
-| left-icon      | 自定义输入框头部图标                                       |
-| right-icon     | 自定义输入框尾部图标                                       |
-| button         | 自定义输入框尾部按钮                                       |
-| extra `v2.8.2` | 自定义输入框最右侧的额外内容                               |
+| 名称       | 说明                                                       |
+| ---------- | ---------------------------------------------------------- |
+| label      | 自定义输入框 label 标签                                    |
+| input      | 自定义输入框，使用此插槽后，与输入框相关的属性和事件将失效 |
+| left-icon  | 自定义输入框头部图标                                       |
+| right-icon | 自定义输入框尾部图标                                       |
+| button     | 自定义输入框尾部按钮                                       |
+| extra      | 自定义输入框最右侧的额外内容                               |
+
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                             | 默认值          | 描述 |
+| -------------------------------- | --------------- | ---- |
+| @field-label-width               | `6.2em`         | -    |
+| @field-label-color               | `@gray-7`       | -    |
+| @field-label-margin-right        | `@padding-sm`   | -    |
+| @field-input-text-color          | `@text-color`   | -    |
+| @field-input-error-text-color    | `@red`          | -    |
+| @field-input-disabled-text-color | `@gray-5`       | -    |
+| @field-placeholder-text-color    | `@gray-5`       | -    |
+| @field-icon-size                 | `16px`          | -    |
+| @field-clear-icon-size           | `16px`          | -    |
+| @field-clear-icon-color          | `@gray-5`       | -    |
+| @field-right-icon-color          | `@gray-6`       | -    |
+| @field-error-message-color       | `@red`          | -    |
+| @field-error-message-text-color  | `12px`          | -    |
+| @field-text-area-min-height      | `60px`          | -    |
+| @field-word-limit-color          | `@gray-7`       | -    |
+| @field-word-limit-font-size      | `@font-size-sm` | -    |
+| @field-word-limit-line-height    | `16px`          | -    |
+| @field-disabled-text-color       | `@gray-5`       | -    |
 
 ## 常见问题
 
@@ -321,4 +356,4 @@ HTML 原生的 `type="number"` 属性在 iOS 和 Android 系统上都存在一�
 
 ### 在桌面端点击清除按钮无效？
 
-清除按钮监听是的移动端 Touch 事件，参见[在桌面端使用](#/zh-CN/quickstart#zai-zhuo-mian-duan-shi-yong)。
+清除按钮监听是的移动端 Touch 事件，参见[桌面端适配](#/zh-CN/advanced-usage#zhuo-mian-duan-gua-pei)。

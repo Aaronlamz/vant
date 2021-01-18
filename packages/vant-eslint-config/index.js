@@ -1,11 +1,11 @@
 module.exports = {
   extends: [
     'airbnb-base',
-    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:vue/recommended',
+    'plugin:vue/vue3-recommended',
     'prettier',
     'prettier/vue',
+    'prettier/@typescript-eslint',
   ],
 
   parserOptions: {
@@ -53,16 +53,15 @@ module.exports = {
     'vue/require-v-for-key': 'off',
     'vue/require-default-prop': 'off',
     'vue/no-unused-components': 'off',
-    'vue/name-property-casing': ['error', 'kebab-case'],
-    'vue/component-name-in-template-casing': ['error', 'kebab-case'],
     // typescript-eslint
     '@typescript-eslint/camelcase': 'off',
-    '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
   },
 };

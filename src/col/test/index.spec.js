@@ -1,48 +1,43 @@
 import Col from '..';
 import Row from '../../row';
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 
-test('Col click event', () => {
-  const wrapper = mount(Col);
-  wrapper.trigger('click');
-
-  expect(wrapper.emitted('click')).toBeTruthy();
+test('should render Col correcly', () => {
+  const wrapper = mount(Col, {
+    props: {
+      span: 8,
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('Row click event', () => {
-  const wrapper = mount(Row);
-  wrapper.trigger('click');
-
-  expect(wrapper.emitted('click')).toBeTruthy();
-});
-
-test('gutter prop', () => {
+test('should render gutter correctly', () => {
   const wrapper = mount({
-    template: `
-      <van-row gutter="24">
-        <van-col span="24">24</van-col>
+    render: () => (
+      <Row gutter="24">
+        <Col span="24">24</Col>
 
-        <van-col span="12">12</van-col>
-        <van-col span="12">12</van-col>
+        <Col span="12">12</Col>
+        <Col span="12">12</Col>
 
-        <van-col span="8">8</van-col>
-        <van-col span="8">8</van-col>
-        <van-col span="8">8</van-col>
+        <Col span="8">8</Col>
+        <Col span="8">8</Col>
+        <Col span="8">8</Col>
 
-        <van-col span="6">6</van-col>
-        <van-col span="6">6</van-col>
-        <van-col span="6">6</van-col>
-        <van-col span="6">6</van-col>
-        
-        <van-col span="7">7</van-col>
-        <van-col span="6">6</van-col>
-        <van-col span="5">5</van-col>
-        <van-col span="4">4</van-col>
-        <van-col span="3">3</van-col>
-        <van-col span="2">2</van-col>
-      </van-row>
-    `,
+        <Col span="6">6</Col>
+        <Col span="6">6</Col>
+        <Col span="6">6</Col>
+        <Col span="6">6</Col>
+
+        <Col span="7">7</Col>
+        <Col span="6">6</Col>
+        <Col span="5">5</Col>
+        <Col span="4">4</Col>
+        <Col span="3">3</Col>
+        <Col span="2">2</Col>
+      </Row>
+    ),
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });

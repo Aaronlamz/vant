@@ -3,11 +3,12 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Step, Steps } from 'vant';
 
-Vue.use(Step);
-Vue.use(Steps);
+const app = createApp();
+app.use(Step);
+app.use(Steps);
 ```
 
 ## Usage
@@ -24,11 +25,12 @@ Vue.use(Steps);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      active: 1,
-    };
+  steup() {
+    const active = ref(1);
+    return { active };
   },
 };
 ```
@@ -72,7 +74,7 @@ export default {
 | active | Active step | _number \| string_ | `0` |
 | direction | Can be set to `vertical` | _string_ | `horizontal` |
 | active-color | Active step color | _string_ | `#07c160` |
-| inactive-color `v2.9.1` | Inactive step color | _string_ | `#969799` |
+| inactive-color | Inactive step color | _string_ | `#969799` |
 | active-icon | Active icon name | _string_ | `checked` |
 | inactive-icon | Inactive icon name | _string_ | - |
 
@@ -87,4 +89,23 @@ export default {
 
 | Event | Description | Arguments |
 | --- | --- | --- |
-| click-step `v2.5.9` | Triggered when a step's title or icon is clicked | _index: number_ |
+| click-step | Emitted when a step's title or icon is clicked | _index: number_ |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name                             | Default Value   | Description |
+| -------------------------------- | --------------- | ----------- |
+| @step-text-color                 | `@gray-6`       | -           |
+| @step-active-color               | `@green`        | -           |
+| @step-process-text-color         | `@text-color`   | -           |
+| @step-font-size                  | `@font-size-md` | -           |
+| @step-line-color                 | `@border-color` | -           |
+| @step-finish-line-color          | `@green`        | -           |
+| @step-finish-text-color          | `@text-color`   | -           |
+| @step-icon-size                  | `12px`          | -           |
+| @step-circle-size                | `5px`           | -           |
+| @step-circle-color               | `@gray-6`       | -           |
+| @step-horizontal-title-font-size | `@font-size-sm` | -           |
+| @steps-background-color          | `@white`        | -           |

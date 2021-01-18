@@ -11,6 +11,7 @@
     - [site.nav](#sitenav)
     - [site.versions](#siteversions)
     - [site.baiduAnalytics](#sitebaiduanalytics)
+    - [site.searchConfig](#sitesearchconfig)
   - [Webpack](#webpack)
   - [Babel](#babel)
     - [默认配置](#-1)
@@ -184,8 +185,8 @@ module.exports = {
   site: {
     versions: [
       {
-        label: '1.x',
-        link: 'https://youzan.github.io/vant/1.x/',
+        label: 'v1',
+        link: 'https://youzan.github.io/vant/v1/',
       },
     ],
   },
@@ -211,6 +212,22 @@ module.exports = {
   },
 };
 ```
+
+### site.searchConfig
+
+- Type: `object`
+- Default: `undefined`
+
+文档网站的搜索配置，基于 algolia 提供的 docsearch 服务实现。
+
+配置内容参见 [docsearch](https://docsearch.algolia.com/docs/behavior)。
+
+### site.htmlPluginOptions
+
+- Type: `object`
+- Default: `undefined`
+
+html-webpack-plugin 的配置项，详见 [Options](https://github.com/jantimon/html-webpack-plugin#options)。
 
 ## Webpack
 
@@ -252,22 +269,12 @@ module.exports = {
 
 ### 依赖
 
-由于使用了`@babel/plugin-transform-runtime`来优化 Babel 的 helper 函数，你需要将`@babel/runtime`添加到`package.json`的依赖项：
+由于使用了 `@babel/plugin-transform-runtime` 来优化 Babel 的 helper 函数，你需要将 `@babel/runtime` 添加到 `package.json` 的依赖项：
 
 ```json
 {
   "dependencies": {
     "@babel/runtime": "7.x"
-  }
-}
-```
-
-如果使用了 JSX 的语法，还需要将`@vue/babel-helper-vue-jsx-merge-props`添加到依赖中：
-
-```json
-{
-  "dependencies": {
-    "@vue/babel-helper-vue-jsx-merge-props": "^1.0.0"
   }
 }
 ```

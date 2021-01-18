@@ -1,111 +1,118 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('basicUsage')">
-      <van-swipe :autoplay="3000" indicator-color="white">
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
-      </van-swipe>
-    </demo-block>
+  <demo-block :title="t('basicUsage')">
+    <van-swipe :autoplay="3000" indicator-color="white">
+      <van-swipe-item>1</van-swipe-item>
+      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item>3</van-swipe-item>
+      <van-swipe-item>4</van-swipe-item>
+    </van-swipe>
+  </demo-block>
 
-    <demo-block :title="t('title2')">
-      <van-swipe :autoplay="3000">
-        <van-swipe-item v-for="(image, index) in images" :key="index">
-          <img v-lazy="image" />
-        </van-swipe-item>
-      </van-swipe>
-    </demo-block>
+  <demo-block :title="t('title2')">
+    <van-swipe :autoplay="3000" lazy-render>
+      <van-swipe-item v-for="image in images" :key="image">
+        <img :src="image" />
+      </van-swipe-item>
+    </van-swipe>
+  </demo-block>
 
-    <demo-block :title="t('title3')">
-      <van-swipe indicator-color="white" @change="onChange1">
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
-      </van-swipe>
-    </demo-block>
+  <demo-block :title="t('title3')">
+    <van-swipe indicator-color="white" @change="onChange1">
+      <van-swipe-item>1</van-swipe-item>
+      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item>3</van-swipe-item>
+      <van-swipe-item>4</van-swipe-item>
+    </van-swipe>
+  </demo-block>
 
-    <demo-block :title="t('title4')">
-      <van-swipe
-        vertical
-        :autoplay="3000"
-        indicator-color="white"
-        style="height: 200px;"
-        class="demo-swipe--vertical"
-      >
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
-      </van-swipe>
-    </demo-block>
+  <demo-block :title="t('title4')">
+    <van-swipe
+      vertical
+      :autoplay="3000"
+      indicator-color="white"
+      style="height: 200px"
+      class="demo-swipe--vertical"
+    >
+      <van-swipe-item>1</van-swipe-item>
+      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item>3</van-swipe-item>
+      <van-swipe-item>4</van-swipe-item>
+    </van-swipe>
+  </demo-block>
 
-    <demo-block :title="t('title5')">
-      <van-swipe :width="300" :loop="false" indicator-color="white">
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
-      </van-swipe>
-    </demo-block>
+  <demo-block :title="t('title5')">
+    <van-swipe :width="300" :loop="false" indicator-color="white">
+      <van-swipe-item>1</van-swipe-item>
+      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item>3</van-swipe-item>
+      <van-swipe-item>4</van-swipe-item>
+    </van-swipe>
+  </demo-block>
 
-    <demo-block :title="t('title6')">
-      <van-swipe @change="onChange2">
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
+  <demo-block :title="t('title6')">
+    <van-swipe @change="onChange2">
+      <van-swipe-item>1</van-swipe-item>
+      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item>3</van-swipe-item>
+      <van-swipe-item>4</van-swipe-item>
 
-        <template #indicator>
-          <div class="custom-indicator">{{ current + 1 }}/4</div>
-        </template>
-      </van-swipe>
-    </demo-block>
-  </demo-section>
+      <template #indicator>
+        <div class="custom-indicator">{{ current + 1 }}/4</div>
+      </template>
+    </van-swipe>
+  </demo-block>
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useTranslate } from '@demo/use-translate';
+import Toast from '../../toast';
+
+const i18n = {
+  'zh-CN': {
+    title2: '懒加载',
+    title3: '监听 change 事件',
+    title4: '纵向滚动',
+    title5: '自定义滑块大小',
+    title6: '自定义指示器',
+    message: '当前 Swipe 索引：',
+  },
+  'en-US': {
+    title2: 'Lazy Render',
+    title3: 'Change Event',
+    title4: 'Vertical Scrolling',
+    title5: 'Set SwipeItem Size',
+    title6: 'Custom indicator',
+    message: 'Current Swipe index:',
+  },
+};
+
 export default {
-  i18n: {
-    'zh-CN': {
-      title2: '图片懒加载',
-      title3: '监听 change 事件',
-      title4: '纵向滚动',
-      title5: '自定义滑块大小',
-      title6: '自定义指示器',
-      message: '当前 Swipe 索引：',
-    },
-    'en-US': {
-      title2: 'Image Lazyload',
-      title3: 'Change Event',
-      title4: 'Vertical Scrolling',
-      title5: 'Set SwipeItem Size',
-      title6: 'Custom indicator',
-      message: 'Current Swipe index:',
-    },
-  },
+  setup() {
+    const t = useTranslate(i18n);
+    const current = ref(0);
+    const images = [
+      'https://img.yzcdn.cn/vant/apple-1.jpg',
+      'https://img.yzcdn.cn/vant/apple-2.jpg',
+      'https://img.yzcdn.cn/vant/apple-3.jpg',
+      'https://img.yzcdn.cn/vant/apple-4.jpg',
+    ];
 
-  data() {
-    return {
-      current: 0,
-      images: [
-        'https://img.yzcdn.cn/vant/apple-1.jpg',
-        'https://img.yzcdn.cn/vant/apple-2.jpg',
-        'https://img.yzcdn.cn/vant/apple-3.jpg',
-        'https://img.yzcdn.cn/vant/apple-4.jpg',
-      ],
+    const onChange1 = (index) => {
+      Toast(t('message') + index);
     };
-  },
 
-  methods: {
-    onChange1(index) {
-      this.$toast(this.t('message') + index);
-    },
+    const onChange2 = (index) => {
+      current.value = index;
+    };
 
-    onChange2(index) {
-      this.current = index;
-    },
+    return {
+      t,
+      images,
+      current,
+      onChange1,
+      onChange2,
+    };
   },
 };
 </script>

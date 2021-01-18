@@ -1,34 +1,50 @@
+import { nextTick } from 'vue';
+import { mount, triggerDrag } from '../../../test';
 import Popup from '..';
-import { mount, triggerDrag, later } from '../../../test';
 
 let wrapper;
 afterEach(() => {
-  wrapper.destroy();
+  wrapper.unmount();
 });
 
-test('lazy render', () => {
-  wrapper = mount(Popup);
-  expect(wrapper.vm.$el.tagName).toBeFalsy();
-  wrapper.vm.value = true;
-  expect(wrapper.vm.$el.tagName).toBeTruthy();
-});
-
-test('reset z-index', () => {
+test('should lazy render content by default', async () => {
   wrapper = mount(Popup, {
-    propsData: {
-      value: true,
-      zIndex: 10,
-      lockScroll: false,
+    slots: {
+      default: () => <div class="foo" />,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.foo').exists()).toBeFalsy();
+
+  await wrapper.setProps({ show: true });
+  expect(wrapper.find('.foo').exists()).toBeTruthy();
 });
 
-test('popup lock scroll', () => {
+test('should change z-index when using z-index prop', async () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+      zIndex: 10,
+    },
+  });
+
+  await nextTick();
+  expect(wrapper.find('.van-popup').element.style.zIndex).toEqual('11');
+  expect(wrapper.find('.van-overlay').element.style.zIndex).toEqual('11');
+});
+
+test('should lock scroll when showed', async () => {
+  wrapper = mount(Popup);
+  expect(document.body.classList.contains('van-overflow-hidden')).toBeFalsy();
+
+  await wrapper.setProps({ show: true });
+  expect(document.body.classList.contains('van-overflow-hidden')).toBeTruthy();
+});
+
+test('should lock page scroll by default', () => {
   const wrapper1 = mount(Popup, {
-    propsData: {
-      value: true,
+    props: {
+      show: true,
     },
   });
   expect(document.body.classList.contains('van-overflow-hidden')).toBeTruthy();
@@ -36,230 +52,140 @@ test('popup lock scroll', () => {
   triggerDrag(document, 0, -150);
 
   const wrapper2 = mount(Popup, {
-    propsData: {
-      value: true,
+    props: {
+      show: true,
     },
   });
-  wrapper1.vm.$destroy();
+  wrapper1.unmount();
   expect(document.body.classList.contains('van-overflow-hidden')).toBeTruthy();
 
-  wrapper2.vm.$destroy();
+  wrapper2.unmount();
   expect(document.body.classList.contains('van-overflow-hidden')).toBeFalsy();
 });
 
-test('get container with parent', () => {
-  const div1 = document.createElement('div');
-  const div2 = document.createElement('div');
-  wrapper = mount({
-    template: `
-      <div>
-        <popup :value="true" :get-container="getContainer" />
-      </div>
-    `,
-    components: {
-      Popup,
-    },
-    data() {
-      return {
-        getContainer: () => div1,
-      };
+test('should allow to using teleport prop', async () => {
+  const div = document.createElement('div');
+  mount({
+    render() {
+      return <Popup show teleport={div} />;
     },
   });
+
+  expect(div.querySelector('.van-popup')).toBeTruthy();
+});
+
+test('should render overlay by default', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+    },
+  });
+  expect(wrapper.find('.van-overlay').exists()).toBeTruthy();
+});
+
+test('should not render overlay when overlay prop is false', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+      overlay: false,
+    },
+  });
+  expect(wrapper.find('.van-overlay').exists()).toBeFalsy();
+});
+
+test('should emit click-overlay event when overlay is clicked', async () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+    },
+  });
+  const overlay = wrapper.find('.van-overlay');
+  overlay.trigger('click');
+  expect(wrapper.emitted('click-overlay').length).toEqual(1);
+});
+
+test('should emit open event when show prop is set to true', async () => {
+  const onOpen = jest.fn();
+  wrapper = mount(Popup, {
+    props: {
+      onOpen,
+    },
+  });
+
+  await wrapper.setProps({ show: true });
+  expect(onOpen).toHaveBeenCalledTimes(1);
+});
+
+test('should emit close event when show prop is set to false', async () => {
+  const onClose = jest.fn();
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+      onClose,
+    },
+  });
+
+  await wrapper.setProps({ show: false });
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test('should change duration when using duration prop', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
+      duration: 0.5,
+    },
+  });
+
   const popup = wrapper.find('.van-popup').element;
-
-  expect(popup.parentNode).toEqual(div1);
-  wrapper.vm.getContainer = () => div2;
-  expect(popup.parentNode).toEqual(div2);
-  wrapper.vm.getContainer = null;
-  expect(popup.parentNode).toEqual(wrapper.element);
+  const overlay = wrapper.find('.van-overlay').element;
+  expect(popup.style.animationDuration).toEqual('0.5s');
+  expect(overlay.style.animationDuration).toEqual('0.5s');
 });
 
-test('get container with selector', () => {
-  wrapper = mount({
-    template: `
-      <div>
-        <popup class="get-container-selector-1" :value="true" get-container="body"></popup>
-        <popup class="get-container-selector-2" :value="true" get-container="unknown"></popup>
-      </div>
-    `,
-    components: {
-      Popup,
-    },
-  });
-
-  const dom1 = document.querySelector('.get-container-selector-1');
-  const dom2 = wrapper.vm.$el.querySelector('.get-container-selector-2');
-
-  expect(dom1.parentNode).toEqual(document.body);
-  expect(dom2.parentNode).toEqual(wrapper.vm.$el);
-});
-
-test('render overlay', async () => {
-  const div = document.createElement('div');
-  wrapper = mount({
-    template: `
-      <div>
-        <popup :value="true" :get-container="getContainer" />
-      </div>
-    `,
-    components: {
-      Popup,
-    },
-    data() {
-      return {
-        getContainer: () => div,
-      };
-    },
-  });
-
-  await later();
-
-  expect(div.querySelector('.van-overlay')).toBeTruthy();
-});
-
-test('watch overlay prop', async () => {
-  const div = document.createElement('div');
-  wrapper = mount({
-    template: `
-      <div>
-        <popup :value="show" :overlay="overlay" :get-container="getContainer" />
-      </div>
-    `,
-    components: {
-      Popup,
-    },
-    data() {
-      return {
-        show: false,
-        overlay: false,
-        getContainer: () => div,
-      };
-    },
-  });
-
-  await later();
-  expect(div.querySelector('.van-overlay')).toBeFalsy();
-
-  wrapper.setData({ overlay: true });
-  await later();
-  expect(div.querySelector('.van-overlay')).toBeFalsy();
-
-  wrapper.setData({ show: true });
-  await later();
-  expect(div.querySelector('.van-overlay')).toBeTruthy();
-});
-
-test('close on click overlay', async () => {
-  const div = document.createElement('div');
-  const onClickOverlay = jest.fn();
-
-  wrapper = mount({
-    template: `
-      <div>
-        <popup
-          v-model="value"
-          :get-container="getContainer"
-          @click-overlay="onClickOverlay"
-        />
-      </div>
-    `,
-    components: {
-      Popup,
-    },
-    data() {
-      return {
-        value: true,
-        getContainer: () => div,
-      };
-    },
-    methods: {
-      onClickOverlay,
-    },
-  });
-
-  await later();
-
-  const modal = div.querySelector('.van-overlay');
-  triggerDrag(modal, 0, -30);
-  modal.click();
-
-  expect(wrapper.vm.value).toBeFalsy();
-  expect(onClickOverlay).toHaveBeenCalledTimes(1);
-});
-
-test('open & close event', () => {
-  const wrapper = mount(Popup);
-  wrapper.vm.value = true;
-  expect(wrapper.emitted('open')).toBeTruthy();
-  wrapper.vm.value = false;
-  expect(wrapper.emitted('close')).toBeTruthy();
-});
-
-test('click event', () => {
-  const wrapper = mount(Popup, {
-    propsData: {
-      value: true,
-    },
-  });
-
-  wrapper.trigger('click');
-  expect(wrapper.emitted('click')).toBeTruthy();
-});
-
-test('duration prop when position is center', () => {
-  const wrapper = mount(Popup, {
-    propsData: {
-      value: true,
-      duration: 0.5,
-    },
-  });
-
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('duration prop when position is top', () => {
-  const wrapper = mount(Popup, {
-    propsData: {
-      value: true,
-      duration: 0.5,
-      position: 'top',
-    },
-  });
-
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('round prop', () => {
-  const wrapper = mount(Popup, {
-    propsData: {
-      value: true,
+test('should have "van-popup--round" class when setting the round prop', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
       round: true,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-popup--round').exists()).toBeTruthy();
 });
 
-test('closeable prop', () => {
-  const wrapper = mount(Popup, {
-    propsData: {
-      value: true,
+test('should render close icon when using closeable prop', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
       closeable: true,
     },
   });
 
   wrapper.find('.van-popup__close-icon').trigger('click');
-  expect(wrapper.emitted('input')[0][0]).toEqual(false);
+  expect(wrapper.emitted('update:show')[0][0]).toEqual(false);
 });
 
-test('close-icon prop', () => {
-  const wrapper = mount(Popup, {
+test('should emit click-close-icon event when close icon is clicked', () => {
+  wrapper = mount(Popup, {
     propsData: {
-      value: true,
+      show: true,
+      closeable: true,
+    },
+  });
+
+  wrapper.find('.van-popup__close-icon').trigger('click');
+  expect(wrapper.emitted('click-close-icon').length).toEqual(1);
+});
+
+test('should render correct close icon when using close-icon prop', () => {
+  wrapper = mount(Popup, {
+    props: {
+      show: true,
       closeable: true,
       closeIcon: 'success',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-popup__close-icon').html()).toMatchSnapshot();
 });

@@ -16,34 +16,39 @@
   </demo-block>
 </template>
 
-<script>
-export default {
-  i18n: {
-    'zh-CN': {
-      text: '文本',
-      formatValue: '格式化输入内容',
-      formatOnBlur: '在失焦时执行格式化',
-      formatOnChange: '在输入时执行格式化',
-    },
-    'en-US': {
-      text: 'Text',
-      formatValue: 'Format Value',
-      formatOnBlur: 'Format On Blur',
-      formatOnChange: 'Format On Change',
-    },
-  },
+<script lang="ts">
+import { reactive, toRefs } from 'vue';
+import { useTranslate } from '@demo/use-translate';
 
-  data() {
-    return {
+const i18n = {
+  'zh-CN': {
+    text: '文本',
+    formatValue: '格式化输入内容',
+    formatOnBlur: '在失焦时执行格式化',
+    formatOnChange: '在输入时执行格式化',
+  },
+  'en-US': {
+    text: 'Text',
+    formatValue: 'Format Value',
+    formatOnBlur: 'Format On Blur',
+    formatOnChange: 'Format On Change',
+  },
+};
+
+export default {
+  setup() {
+    const t = useTranslate(i18n);
+    const state = reactive({
       value1: '',
       value2: '',
-    };
-  },
+    });
+    const formatter = (value: string) => value.replace(/\d/g, '');
 
-  methods: {
-    formatter(value) {
-      return value.replace(/\d/g, '');
-    },
+    return {
+      ...toRefs(state),
+      t,
+      formatter,
+    };
   },
 };
 </script>

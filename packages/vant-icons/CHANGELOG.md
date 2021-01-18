@@ -1,5 +1,39 @@
 ## Changelog
 
+## 1.5.0
+
+- add sort icon
+- add font icon
+- add font-o icon
+- add revoke icon
+- add delete-o icon
+
+## 1.4.0
+
+- add encode-woff2.less
+
+## 1.3.2
+
+- fix incomplete after-sale icon
+- fix incomplete cash-back-record icon
+
+## 1.3.1
+
+- add minus icon
+
+## 1.3.0
+
+- add share-o icon
+- fix calendar-o typo
+
+## 1.2.5
+
+- add back-top icon
+
+## 1.2.4
+
+- add photo-fail icon
+
 ## 1.2.3
 
 - fix enlarge icon align

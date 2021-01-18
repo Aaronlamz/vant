@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { watch, nextTick } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import DemoHome from './components/DemoHome';
 import { decamelize } from '../common';
 import { demos, config } from 'site-mobile-shared';
@@ -28,12 +28,16 @@ function getRoutes() {
 
   if (langs.length) {
     routes.push({
-      path: '*',
-      redirect: route => `/${getLangFromRoute(route)}/`,
+      name: 'NotFound',
+      path: '/:path(.*)+',
+      redirect: (route) => ({
+        name: getLangFromRoute(route),
+      }),
     });
 
-    langs.forEach(lang => {
+    langs.forEach((lang) => {
       routes.push({
+        name: lang,
         path: `/${lang}`,
         component: DemoHome,
         meta: { lang },
@@ -41,21 +45,25 @@ function getRoutes() {
     });
   } else {
     routes.push({
-      path: '*',
-      redirect: () => '/',
+      name: 'NotFound',
+      path: '/:path(.*)+',
+      redirect: {
+        name: 'home',
+      },
     });
 
     routes.push({
+      name: 'home',
       path: '/',
       component: DemoHome,
     });
   }
 
-  names.forEach(name => {
+  names.forEach((name) => {
     const component = decamelize(name);
 
     if (langs.length) {
-      langs.forEach(lang => {
+      langs.forEach((lang) => {
         routes.push({
           name: `${lang}/${component}`,
           path: `/${lang}/${component}`,
@@ -68,7 +76,7 @@ function getRoutes() {
       });
     } else {
       routes.push({
-        name,
+        name: component,
         path: `/${component}`,
         component: demos[name],
         meta: {
@@ -81,17 +89,15 @@ function getRoutes() {
   return routes;
 }
 
-Vue.use(VueRouter);
-
-export const router = new VueRouter({
-  mode: 'hash',
+export const router = createRouter({
+  history: createWebHashHistory(),
   routes: getRoutes(),
   scrollBehavior: (to, from, savedPosition) => savedPosition || { x: 0, y: 0 },
 });
 
-router.afterEach(() => {
-  if (!router.currentRoute.redirectedFrom) {
-    Vue.nextTick(window.syncPath);
+watch(router.currentRoute, () => {
+  if (!router.currentRoute.value.redirectedFrom) {
+    nextTick(window.syncPath);
   }
 });
 

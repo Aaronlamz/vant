@@ -1,111 +1,110 @@
 import NumberKeyboard from '..';
-import { mount, trigger } from '../../../test';
+import { mount, trigger, later } from '../../../test';
 
 function clickKey(key) {
   trigger(key, 'touchstart');
   trigger(key, 'touchend');
 }
 
-test('click number key', () => {
-  const wrapper = mount(NumberKeyboard, {
-    propsData: {
-      theme: 'custom',
-      closeButtonText: 'close',
-    },
-  });
-
-  clickKey(wrapper.findAll('.van-key').at(0));
+test('should emit input event after clicking number key', () => {
+  const wrapper = mount(NumberKeyboard);
+  clickKey(wrapper.findAll('.van-key')[0]);
   expect(wrapper.emitted('input')[0][0]).toEqual(1);
-
-  wrapper.destroy();
+  wrapper.unmount();
 });
 
-test('click delete key', () => {
+test('should emit delete event after clicking delete key', () => {
   const wrapper = mount(NumberKeyboard);
-
-  clickKey(wrapper.findAll('.van-key').at(11));
+  clickKey(wrapper.findAll('.van-key')[11]);
   expect(wrapper.emitted('delete')).toBeTruthy();
 });
 
-test('click collapse key', () => {
-  const wrapper = mount(NumberKeyboard);
-  clickKey(wrapper.findAll('.van-key').at(9));
-  expect(wrapper.emitted('input')).toBeFalsy();
-  expect(wrapper.emitted('blur')).toBeFalsy();
-
-  wrapper.setProps({ show: true });
-  clickKey(wrapper.findAll('.van-key').at(9));
+test('should emit blur event after clicking collapse key', () => {
+  const wrapper = mount(NumberKeyboard, {
+    props: {
+      show: true,
+    },
+  });
+  clickKey(wrapper.findAll('.van-key')[9]);
   expect(wrapper.emitted('blur')).toBeTruthy();
 });
 
-test('click close button', () => {
+test('should should emit blur event when hidden', () => {
+  const wrapper = mount(NumberKeyboard);
+  clickKey(wrapper.findAll('.van-key')[9]);
+  expect(wrapper.emitted('input')).toBeFalsy();
+  expect(wrapper.emitted('blur')).toBeFalsy();
+});
+
+test('should emit close event after clicking close button', () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       theme: 'custom',
-      closeButtonText: 'close',
     },
   });
-
-  clickKey(wrapper.findAll('.van-key').at(12));
+  clickKey(wrapper.findAll('.van-key')[12]);
   expect(wrapper.emitted('close')).toBeTruthy();
 });
 
-test('listen to show/hide event when has transtion', () => {
-  const wrapper = mount(NumberKeyboard);
-  wrapper.vm.show = true;
-  wrapper.trigger('animationend');
-  wrapper.vm.show = false;
-  wrapper.trigger('animationend');
-  expect(wrapper.emitted('show')).toBeTruthy();
-  expect(wrapper.emitted('hide')).toBeTruthy();
-});
-
-test('listen to show event when no transtion', () => {
+test('should emit show/blur event when visibility changed and transition is disabled', async () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       transition: false,
     },
   });
-  wrapper.vm.show = true;
-  wrapper.vm.show = false;
+
+  wrapper.setProps({ show: true });
+  await later();
   expect(wrapper.emitted('show')).toBeTruthy();
+  wrapper.setProps({ show: false });
+  await later();
   expect(wrapper.emitted('hide')).toBeTruthy();
 });
 
-test('render title', () => {
+test('should render title and close button correctly', () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       title: 'Title',
       closeButtonText: 'Close',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-number-keyboard__header').html()).toMatchSnapshot();
 });
 
-test('title-left slot', () => {
+test('should render title-left slot correctly', () => {
   const wrapper = mount(NumberKeyboard, {
-    scopedSlots: {
+    slots: {
       'title-left': () => 'Custom Title Left',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-number-keyboard__header').html()).toMatchSnapshot();
 });
 
-test('extra-key slot', () => {
+test('should render extra key correctly when using extra-key prop', () => {
   const wrapper = mount(NumberKeyboard, {
-    scopedSlots: {
+    props: {
+      extraKey: 'foo',
+    },
+  });
+
+  expect(wrapper.findAll('.van-key')[9].html()).toMatchSnapshot();
+});
+
+test('should render extra-key slot correctly', () => {
+  const wrapper = mount(NumberKeyboard, {
+    slots: {
       'extra-key': () => 'Custom Extra Key',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.findAll('.van-key')[9].html()).toMatchSnapshot();
 });
 
-test('hideOnClickOutside', () => {
+test('should emit blur event after clicking outside', () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       show: true,
     },
   });
@@ -114,9 +113,9 @@ test('hideOnClickOutside', () => {
   expect(wrapper.emitted('blur')).toBeTruthy();
 });
 
-test('disable hideOnClickOutside', () => {
+test('should not emit blur event after clicking outside when hideOnClickOutside is false', () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       show: true,
       hideOnClickOutside: false,
     },
@@ -126,105 +125,108 @@ test('disable hideOnClickOutside', () => {
   expect(wrapper.emitted('blur')).toBeFalsy();
 });
 
-test('focus on key', () => {
+test('should add "van-key--active" className to key when focused', async () => {
   const wrapper = mount(NumberKeyboard);
-
   const key = wrapper.find('.van-key');
-  trigger(key, 'touchstart');
-  expect(wrapper).toMatchSnapshot();
-  trigger(key, 'touchend');
-  expect(wrapper).toMatchSnapshot();
+
+  await trigger(key, 'touchstart');
+  expect(key.classes()).toContain('van-key--active');
+
+  await trigger(key, 'touchend');
+  expect(key.classes()).not.toContain('van-key--active');
+
+  expect(wrapper.emitted('input')).toBeTruthy();
 });
 
-test('move and blur key', () => {
+test('should remove "van-key--active" className from key when touch moved', async () => {
   const wrapper = mount(NumberKeyboard);
-
   const key = wrapper.find('.van-key');
-  trigger(key, 'touchstart');
-  expect(wrapper).toMatchSnapshot();
-  trigger(key, 'touchmove', 0, 0);
-  expect(wrapper).toMatchSnapshot();
-  trigger(key, 'touchmove', 100, 0);
-  expect(wrapper).toMatchSnapshot();
-  trigger(key, 'touchend');
+
+  await trigger(key, 'touchstart');
+  expect(key.classes()).toContain('van-key--active');
+
+  await trigger(key, 'touchmove', 0, 0);
+  expect(key.classes()).toContain('van-key--active');
+
+  await trigger(key, 'touchmove', 100, 0);
+  expect(key.classes()).not.toContain('van-key--active');
+
+  await trigger(key, 'touchend');
   expect(wrapper.emitted('input')).toBeFalsy();
 });
 
-test('bind value', () => {
-  const wrapper = mount(NumberKeyboard, {
-    propsData: {
-      value: '',
-    },
-    listeners: {
-      'update:value': (value) => {
-        wrapper.setProps({ value });
-      },
-    },
-  });
-
+test('should emit "update:modelValue" event after clicking key', () => {
+  const wrapper = mount(NumberKeyboard);
   const keys = wrapper.findAll('.van-key');
-  clickKey(keys.at(0));
-  clickKey(keys.at(1));
 
-  expect(wrapper.vm.value).toEqual('12');
+  clickKey(keys[0]);
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual('1');
 
-  clickKey(keys.at(11));
-  expect(wrapper.vm.value).toEqual('1');
+  clickKey(keys[1]);
+  expect(wrapper.emitted('update:modelValue')[1][0]).toEqual('2');
 });
 
-test('maxlength', () => {
+test('should limit max length of modelValue when using maxlength prop', async () => {
   const onInput = jest.fn();
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
-      value: '',
+    props: {
+      onInput,
       maxlength: 1,
-    },
-    listeners: {
-      input: onInput,
-      'update:value': (value) => {
-        wrapper.setProps({ value });
-      },
     },
   });
 
   const keys = wrapper.findAll('.van-key');
-  clickKey(keys.at(0));
-  clickKey(keys.at(1));
 
-  expect(wrapper.vm.value).toEqual('1');
+  clickKey(keys[0]);
   expect(onInput).toHaveBeenCalledTimes(1);
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual('1');
+  await wrapper.setProps({ modelValue: '1' });
+
+  clickKey(keys[1]);
+  expect(onInput).toHaveBeenCalledTimes(1);
+  expect(wrapper.emitted('update:modelValue').length).toEqual(1);
 });
 
-test('show-delete-key prop', () => {
+test('should not render delete key when show-delete-key prop is false', async () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       showDeleteKey: true,
     },
   });
+  expect(wrapper.find('.van-key--delete').exists()).toBeTruthy();
 
-  expect(wrapper.contains('.van-key--delete')).toBeTruthy();
-
-  wrapper.setData({ showDeleteKey: false });
-  expect(wrapper.contains('.van-key--delete')).toBeFalsy();
-
-  wrapper.setData({
-    theme: 'custom',
-    showDeleteKey: true,
-  });
-  expect(wrapper.contains('.van-key--delete')).toBeTruthy();
-
-  wrapper.setData({ showDeleteKey: false });
-  expect(wrapper.contains('.van-key--delete')).toBeFalsy();
+  await wrapper.setProps({ showDeleteKey: false });
+  expect(wrapper.find('.van-key--delete').exists()).toBeFalsy();
 });
 
-test('close-button-loading prop', () => {
+test('should render loading icon when using close-button-loading prop', () => {
   const wrapper = mount(NumberKeyboard, {
-    propsData: {
+    props: {
       show: true,
       theme: 'custom',
       closeButtonLoading: true,
     },
   });
 
-  expect(wrapper.contains('.van-key__loading-icon')).toBeTruthy();
+  expect(wrapper.find('.van-key__loading-icon').exists()).toBeTruthy();
+});
+
+test('should shuffle key order when using random-key-order prop', () => {
+  const wrapper = mount(NumberKeyboard, {
+    propsData: {
+      show: true,
+      randomKeyOrder: true,
+    },
+  });
+
+  const keys = [];
+  const clickKeys = [];
+
+  for (let i = 0; i < 9; i++) {
+    keys.push(i + 1);
+    clickKey(wrapper.findAll('.van-key')[i]);
+    clickKeys.push(wrapper.emitted('input')[i][0]);
+  }
+
+  expect(keys.every((v, k) => keys[k] === clickKeys[k])).toEqual(false);
 });

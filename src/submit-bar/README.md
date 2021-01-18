@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { SubmitBar } from 'vant';
 
-Vue.use(SubmitBar);
+const app = createApp();
+app.use(SubmitBar);
 ```
 
 ## Usage
@@ -15,6 +16,22 @@ Vue.use(SubmitBar);
 
 ```html
 <van-submit-bar :price="3050" button-text="Submit" @submit="onSubmit" />
+```
+
+```js
+import { Toast } from 'vant';
+
+export default {
+  setup() {
+    const onSubmit = () => {
+      Toast('Submit');
+    };
+
+    return {
+      onSubmit,
+    };
+  },
+};
 ```
 
 ### Disabled
@@ -47,10 +64,28 @@ Use slot to add custom contents.
 ```html
 <van-submit-bar :price="3050" button-text="Submit" @submit="onSubmit">
   <van-checkbox v-model="checked">Check</van-checkbox>
-  <template #tip>
-    Some tips, <span @click="onClickEditAddress">Link</span>
-  </template>
+  <template #tip> Some tips, <span @click="onClickLink">Link</span> </template>
 </van-submit-bar>
+```
+
+```js
+import { Toast } from 'vant';
+
+export default {
+  setup() {
+    const onSubmit = () => {
+      Toast('Submit');
+    };
+    const onClickLink = () => {
+      Toast('Click Link');
+    };
+
+    return {
+      onSubmit,
+      onClickLink,
+    };
+  },
+};
 ```
 
 ## API
@@ -60,16 +95,16 @@ Use slot to add custom contents.
 | Attribute | Description | Type | Default |
 | --- | --- | --- | --- |
 | price | Price | _number_ | - |
+| decimal-length | Price dicemal length | _number \| string_ | `2` |
 | label | Price left label | _string_ | `Total：` |
 | suffix-label | Price right label | _string_ | - |
-| text-align `v2.3.0` | Price label text align can be set to `left` | _string_ | `right` |
+| text-align | Price label text align can be set to `left` | _string_ | `right` |
 | button-text | Button text | _string_ | - |
 | button-type | Button type | _string_ | `danger` |
-| button-color `v2.9.1` | Button color | _string_ | - |
+| button-color | Button color | _string_ | - |
 | tip | Tip | _string_ | - |
 | tip-icon | Icon | _string_ | - |
 | currency | Currency symbol | _string_ | `¥` |
-| decimal-length | number of digits to appear after the decimal point | _number \| string_ | `2` |
 | disabled | Whether to disable button | _boolean_ | `false` |
 | loading | Whether to show loading icon | _boolean_ | `false` |
 | safe-area-inset-bottom | Whether to enable bottom safe area adaptation | _boolean_ | `true` |
@@ -85,5 +120,32 @@ Use slot to add custom contents.
 | Name    | Description         |
 | ------- | ------------------- |
 | default | Custom left content |
+| button  | Custom button       |
 | top     | Custom top content  |
 | tip     | Custom tips         |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name | Default Value | Description |
+| --- | --- | --- |
+| @submit-bar-height | `50px` | - |
+| @submit-bar-z-index | `100` | - |
+| @submit-bar-background-color | `@white` | - |
+| @submit-bar-button-width | `110px` | - |
+| @submit-bar-price-color | `@red` | - |
+| @submit-bar-price-font-size | `@font-size-md` | - |
+| @submit-bar-currency-font-size | `@font-size-md` | - |
+| @submit-bar-text-color | `@text-color` | - |
+| @submit-bar-text-font-size | `@font-size-md` | - |
+| @submit-bar-tip-padding | `@padding-xs @padding-sm` | - |
+| @submit-bar-tip-font-size | `@font-size-sm` | - |
+| @submit-bar-tip-line-height | `1.5` | - |
+| @submit-bar-tip-color | `#f56723` | - |
+| @submit-bar-tip-background-color | `#fff7cc` | - |
+| @submit-bar-tip-icon-size | `12px` | - |
+| @submit-bar-button-height | `40px` | - |
+| @submit-bar-padding | `0 @padding-md` | - |
+| @submit-bar-price-integer-font-size | `20px` | - |
+| @submit-bar-price-font-family | `@price-integer-font-family` | - |

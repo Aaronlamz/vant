@@ -1,50 +1,55 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('basicUsage')">
-      <van-button
-        type="primary"
-        :text="t('showOverlay')"
-        style="margin-left: 16px;"
-        @click="show = true"
-      />
+  <demo-block :title="t('basicUsage')">
+    <van-button
+      type="primary"
+      :text="t('showOverlay')"
+      style="margin-left: 16px"
+      @click="show = true"
+    />
+    <van-overlay :show="show" @click="show = false" />
+  </demo-block>
 
-      <van-overlay :show="show" @click="show = false" />
-    </demo-block>
-
-    <demo-block :title="t('embeddedContent')">
-      <van-button
-        type="primary"
-        :text="t('embeddedContent')"
-        style="margin-left: 16px;"
-        @click="showEmbedded = true"
-      />
-
-      <van-overlay :show="showEmbedded" @click="showEmbedded = false">
-        <div class="wrapper">
-          <div class="block" />
-        </div>
-      </van-overlay>
-    </demo-block>
-  </demo-section>
+  <demo-block :title="t('embeddedContent')">
+    <van-button
+      type="primary"
+      :text="t('embeddedContent')"
+      style="margin-left: 16px"
+      @click="showEmbedded = true"
+    />
+    <van-overlay :show="showEmbedded" @click="showEmbedded = false">
+      <div class="wrapper">
+        <div class="block" />
+      </div>
+    </van-overlay>
+  </demo-block>
 </template>
 
-<script>
-export default {
-  i18n: {
-    'zh-CN': {
-      showOverlay: '显示遮罩层',
-      embeddedContent: '嵌入内容',
-    },
-    'en-US': {
-      showOverlay: 'Show Overlay',
-      embeddedContent: 'Embedded Content',
-    },
-  },
+<script lang="ts">
+import { reactive, toRefs } from 'vue';
+import { useTranslate } from '@demo/use-translate';
 
-  data() {
-    return {
+const i18n = {
+  'zh-CN': {
+    showOverlay: '显示遮罩层',
+    embeddedContent: '嵌入内容',
+  },
+  'en-US': {
+    showOverlay: 'Show Overlay',
+    embeddedContent: 'Embedded Content',
+  },
+};
+
+export default {
+  setup() {
+    const t = useTranslate(i18n);
+    const state = reactive({
       show: false,
       showEmbedded: false,
+    });
+
+    return {
+      ...toRefs(state),
+      t,
     };
   },
 };
@@ -67,6 +72,7 @@ export default {
     width: 120px;
     height: 120px;
     background-color: @white;
+    border-radius: 4px;
   }
 }
 </style>

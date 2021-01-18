@@ -8,10 +8,12 @@
 
 ### Features
 
-- 60+ Reusable components
-- 90% Unit test coverage
+- 65+ Reusable components
+- 1kb Component average size (min+gzip)
+- 90%+ Unit test coverage
 - Extensive documentation and demos
-- Support [babel-plugin-import](https://github.com/ant-design/babel-plugin-import)
+- Support Vue 2 & Vue 3
+- Support Tree Shaking
 - Support Custom Theme
 - Support i18n
 - Support TS
@@ -33,8 +35,11 @@ Modern browsers and Android 4.0+, iOS 8.0+.
 
 | Project | Description |
 | --- | --- |
-| [vant-demo](https://github.com/youzan/vant-demo) | Official vant demo collection |
 | [vant-weapp](https://github.com/youzan/vant-weapp) | WeChat MiniProgram UI |
+| [vant-aliapp](https://github.com/ant-move/Vant-Aliapp) | Alipay MiniProgram UI (maintained by the community) |
+| [vant-react](https://github.com/mxdi9i7/vant-react) | Vant React (maintained by the community) |
+| [vant-use](https://youzan.github.io/vant/vant-use/) | Collection of Vant Composition APIs |
+| [vant-demo](https://github.com/youzan/vant-demo) | Collection of Vant demos |
 | [vant-cli](https://github.com/youzan/vant/tree/dev/packages/vant-cli) | Scaffold for UI library |
 | [vant-icons](https://github.com/youzan/vant/tree/dev/packages/vant-icons) | Vant icons |
 | [vant-touch-emulator](https://github.com/youzan/vant/tree/dev/packages/vant-touch-emulator) | Using vant in desktop browsers |

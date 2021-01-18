@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import { VanPopupMixin } from './mixins/popup';
+import { TeleportProps } from 'vue';
 
 type ToastMessage = string | number;
 type ToastType = 'text' | 'loading' | 'success' | 'fail' | 'html';
@@ -15,6 +14,7 @@ export type ToastOptions = {
   onOpened?: () => void;
   overlay?: boolean;
   duration?: number;
+  teleport?: TeleportProps['to'];
   position?: ToastPosition;
   className?: any;
   transition?: string;
@@ -22,11 +22,12 @@ export type ToastOptions = {
   loadingType?: ToastLoadingType;
   forbidClick?: boolean;
   closeOnClick?: boolean;
+  overlayClass?: any;
+  overlayStyle?: Record<string, any>;
   closeOnClickOverlay?: boolean;
-  getContainer?: string | (() => Element);
 };
 
-export interface VanToast extends Vue, VanPopupMixin {
+export interface VanToast {
   type: ToastType;
   position: ToastPosition;
   loadingType: ToastLoadingType;
@@ -50,8 +51,8 @@ export interface Toast {
   allowMultiple(allow: boolean): void;
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
     $toast: Toast;
   }
 }

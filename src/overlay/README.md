@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Overlay } from 'vant';
 
-Vue.use(Overlay);
+const app = createApp();
+app.use(Overlay);
 ```
 
 ## Usage
@@ -19,13 +20,14 @@ Vue.use(Overlay);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      show: false
-    }
-  }
-},
+  setup() {
+    const show = ref(false);
+    return { show };
+  },
+};
 ```
 
 ### Embedded Content
@@ -63,17 +65,26 @@ export default {
 | z-index | z-index | _number \| string_ | `1` |
 | duration | Animation duration | _number \| string_ | `0.3` |
 | class-name | ClassName | _string_ | - |
-| custom-class `v2.2.5` | Custom style | _object_ | - |
-| lock-scroll `v2.6.2` | Whether to lock background scroll | _boolean_ | `true` |
+| custom-class | Custom style | _object_ | - |
+| lock-scroll | Whether to lock background scroll | _boolean_ | `true` |
 
 ### Events
 
-| Event | Description            | Arguments      |
-| ----- | ---------------------- | -------------- |
-| click | Triggered when clicked | _event: Event_ |
+| Event | Description                       | Arguments      |
+| ----- | --------------------------------- | -------------- |
+| click | Emitted when component is clicked | _event: Event_ |
 
 ### Slots
 
-| Name             | Description  |
-| ---------------- | ------------ |
-| default `v2.2.5` | Default slot |
+| Name    | Description  |
+| ------- | ------------ |
+| default | Default slot |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name                      | Default Value        | Description |
+| ------------------------- | -------------------- | ----------- |
+| @overlay-z-index          | `1`                  | -           |
+| @overlay-background-color | `rgba(0, 0, 0, 0.7)` | -           |

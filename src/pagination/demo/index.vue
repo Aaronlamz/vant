@@ -1,61 +1,87 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('basicUsage')">
-      <van-pagination
-        v-model="currentPage1"
-        :total-items="24"
-        :items-per-page="5"
-        :prev-text="t('prevText')"
-        :next-text="t('nextText')"
-      />
-    </demo-block>
+  <demo-block :title="t('basicUsage')">
+    <van-pagination
+      v-model="currentPage1"
+      :total-items="24"
+      :items-per-page="5"
+      :prev-text="t('prevText')"
+      :next-text="t('nextText')"
+    />
+  </demo-block>
 
-    <demo-block :title="t('title2')">
-      <van-pagination
-        v-model="currentPage2"
-        :page-count="12"
-        :prev-text="t('prevText')"
-        :next-text="t('nextText')"
-        mode="simple"
-        size="small"
-      />
-    </demo-block>
+  <demo-block :title="t('title2')">
+    <van-pagination
+      v-model="currentPage2"
+      :page-count="12"
+      :prev-text="t('prevText')"
+      :next-text="t('nextText')"
+      mode="simple"
+      size="small"
+    />
+  </demo-block>
 
-    <demo-block :title="t('title3')">
-      <van-pagination
-        force-ellipses
-        v-model="currentPage3"
-        :total-items="125"
-        :show-page-size="3"
-        :prev-text="t('prevText')"
-        :next-text="t('nextText')"
-      />
-    </demo-block>
-  </demo-section>
+  <demo-block :title="t('title3')">
+    <van-pagination
+      v-model="currentPage3"
+      force-ellipses
+      :total-items="125"
+      :show-page-size="3"
+      :prev-text="t('prevText')"
+      :next-text="t('nextText')"
+    />
+  </demo-block>
+
+  <demo-block :title="t('title4')">
+    <van-pagination
+      v-model="currentPage4"
+      :total-items="125"
+      :show-page-size="5"
+    >
+      <template #prev-text>
+        <van-icon name="arrow-left" />
+      </template>
+      <template #next-text>
+        <van-icon name="arrow" />
+      </template>
+      <template #page="{ text }">{{ text }}</template>
+    </van-pagination>
+  </demo-block>
 </template>
 
-<script>
-export default {
-  i18n: {
-    'zh-CN': {
-      title2: '简单模式',
-      title3: '显示省略号',
-      prevText: '上一页',
-      nextText: '下一页',
-    },
-    'en-US': {
-      title2: 'Simple Mode',
-      title3: 'Show ellipses',
-      prevText: 'Prev',
-      nextText: 'Next',
-    },
-  },
+<script lang="ts">
+import { reactive, toRefs } from 'vue';
+import { useTranslate } from '@demo/use-translate';
 
-  data() {
-    return {
+const i18n = {
+  'zh-CN': {
+    title2: '简单模式',
+    title3: '显示省略号',
+    title4: '自定义按钮',
+    prevText: '上一页',
+    nextText: '下一页',
+  },
+  'en-US': {
+    title2: 'Simple Mode',
+    title3: 'Show ellipses',
+    title4: 'Custom Button',
+    prevText: 'Prev',
+    nextText: 'Next',
+  },
+};
+
+export default {
+  setup() {
+    const t = useTranslate(i18n);
+    const state = reactive({
       currentPage1: 1,
       currentPage2: 1,
       currentPage3: 1,
+      currentPage4: 1,
+    });
+
+    return {
+      ...toRefs(state),
+      t,
     };
   },
 };

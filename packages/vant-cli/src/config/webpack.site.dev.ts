@@ -1,8 +1,8 @@
-import merge from 'webpack-merge';
 import WebpackBar from 'webpackbar';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { get } from 'lodash';
 import { join } from 'path';
+import { merge } from 'webpack-merge';
 import { baseConfig } from './webpack.base';
 import { WebpackConfig } from '../common/types';
 import { getVantConfig, getWebpackConfig } from '../common';
@@ -39,6 +39,7 @@ export function getSiteDevBaseConfig(): WebpackConfig {
 
   const siteConfig = getSiteConfig();
   const title = getTitle(siteConfig);
+  const { htmlPluginOptions } = vantConfig.site;
 
   return merge(baseConfig as any, {
     entry: {
@@ -47,11 +48,13 @@ export function getSiteDevBaseConfig(): WebpackConfig {
     },
     devServer: {
       port: 8080,
-      quiet: true,
       host: '0.0.0.0',
-      stats: 'errors-only',
-      publicPath: '/',
-      disableHostCheck: true,
+      dev: {
+        publicPath: '/',
+      },
+    },
+    infrastructureLogging: {
+      level: 'warn',
     },
     resolve: {
       alias: {
@@ -88,6 +91,7 @@ export function getSiteDevBaseConfig(): WebpackConfig {
         template: join(__dirname, '../../site/desktop/index.html'),
         filename: 'index.html',
         baiduAnalytics,
+        ...htmlPluginOptions,
       }),
       new HtmlWebpackPlugin({
         title,
@@ -97,11 +101,12 @@ export function getSiteDevBaseConfig(): WebpackConfig {
         template: join(__dirname, '../../site/mobile/index.html'),
         filename: 'mobile.html',
         baiduAnalytics,
+        ...htmlPluginOptions,
       }),
     ],
   });
 }
 
 export function getSiteDevConfig(): WebpackConfig {
-  return merge(getSiteDevBaseConfig(), getWebpackConfig());
+  return getWebpackConfig(getSiteDevBaseConfig());
 }

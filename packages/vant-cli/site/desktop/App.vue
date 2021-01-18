@@ -1,6 +1,7 @@
 <template>
   <div class="app">
     <van-doc
+      v-if="config"
       :lang="lang"
       :config="config"
       :versions="versions"
@@ -14,7 +15,7 @@
 
 <script>
 import VanDoc from './components';
-import { config, packageVersion } from 'site-desktop-shared';
+import { config } from 'site-desktop-shared';
 import { setLang } from '../common/locales';
 
 export default {
@@ -26,7 +27,6 @@ export default {
     const path = location.pathname.replace(/\/index(\.html)?/, '/');
 
     return {
-      packageVersion,
       simulator: `${path}mobile.html${location.hash}`,
     };
   },
@@ -39,7 +39,7 @@ export default {
 
     langConfigs() {
       const { locales = {} } = config.site;
-      return Object.keys(locales).map(key => ({
+      return Object.keys(locales).map((key) => ({
         lang: key,
         label: locales[key].langLabel || '',
       }));
@@ -56,30 +56,47 @@ export default {
     },
 
     versions() {
-      if (config.site.versions) {
-        return [{ label: packageVersion }, ...config.site.versions];
-      }
-
-      return null;
+      return config.site.versions || null;
     },
   },
 
   watch: {
+    // eslint-disable-next-line
+    '$route.path'() {
+      this.setTitle();
+    },
+
     lang(val) {
       setLang(val);
       this.setTitle();
     },
-  },
 
-  created() {
-    this.setTitle();
+    config: {
+      handler(val) {
+        if (val) {
+          this.setTitle();
+        }
+      },
+      immediate: true,
+    },
   },
 
   methods: {
     setTitle() {
       let { title } = this.config;
 
-      if (this.config.description) {
+      const navItems = this.config.nav.reduce(
+        (result, nav) => [...result, ...nav.items],
+        []
+      );
+
+      const current = navItems.find((item) => {
+        return item.path === this.$route.meta.name;
+      });
+
+      if (current && current.title) {
+        title = current.title + ' - ' + title;
+      } else if (this.config.description) {
         title += ` - ${this.config.description}`;
       }
 
@@ -95,7 +112,6 @@ export default {
 
 .van-doc-intro {
   padding-top: 20px;
-  font-family: 'Dosis', 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
   text-align: center;
 
   p {

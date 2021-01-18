@@ -12,26 +12,25 @@
   cursor: pointer;
 
   &__icon {
-    position: relative;
     margin-bottom: @tabbar-item-margin-bottom;
     font-size: @tabbar-item-icon-size;
 
     .van-icon {
       display: block;
-      min-width: 1em;
     }
 
     img {
       display: block;
-      height: @tabbar-item-icon-size;
+      height: 20px;
     }
   }
 
   &--active {
     color: @tabbar-item-active-color;
+    background-color: @tabbar-item-active-background-color;
   }
 
-  .van-info {
-    margin-top: 2px;
+  .van-badge {
+    margin-top: @padding-base;
   }
 }

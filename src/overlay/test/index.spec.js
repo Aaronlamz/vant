@@ -1,31 +1,33 @@
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 import Overlay from '..';
 
-test('z-index prop', () => {
+test('should change z-index when using z-index prop', () => {
   const wrapper = mount(Overlay, {
-    propsData: {
+    props: {
       show: true,
       zIndex: 99,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  const overlay = wrapper.find('.van-overlay').element;
+  expect(overlay.style.zIndex).toEqual('99');
 });
 
-test('class-name prop', () => {
+test('should allow to custom class name with class-name prop', () => {
   const wrapper = mount(Overlay, {
-    propsData: {
+    props: {
       show: true,
-      className: 'my-overlay',
+      className: 'foo',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  const overlay = wrapper.find('.van-overlay');
+  expect(overlay.classes()).toContain('foo');
 });
 
-test('custom style prop', () => {
+test('should allow to custom style with custom-style prop', () => {
   const wrapper = mount(Overlay, {
-    propsData: {
+    props: {
       show: true,
       customStyle: {
         backgroundColor: 'red',
@@ -33,66 +35,62 @@ test('custom style prop', () => {
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  const overlay = wrapper.find('.van-overlay').element;
+  expect(overlay.style.backgroundColor).toEqual('red');
 });
 
-test('duration prop', () => {
+test('should change animation duration when using duration prop', () => {
   const wrapper = mount(Overlay, {
-    propsData: {
+    props: {
       show: true,
       duration: 1,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  const overlay = wrapper.find('.van-overlay').element;
+  expect(overlay.style.animationDuration).toEqual('1s');
 });
 
-test('click event', () => {
-  const onClick = jest.fn();
+test('should render default slot correctly', () => {
   const wrapper = mount(Overlay, {
-    context: {
-      on: {
-        click: onClick,
-      },
-    },
-  });
-
-  wrapper.trigger('click');
-  expect(onClick).toHaveBeenCalledTimes(1);
-});
-
-test('default slot', () => {
-  const wrapper = mount(Overlay, {
-    scopedSlots: {
+    slots: {
       default: () => 'Custom Default',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('lock-scroll prop', () => {
+test('should allow to touchmove when lock-scroll is false', async () => {
   const onTouchMove = jest.fn();
   const wrapper = mount({
-    template: `
-      <div @touchmove="onTouchMove">
-        <van-overlay :lock-scroll="lockScroll" />
-      </div>
-    `,
-    data() {
-      return {
-        lockScroll: true,
-      };
-    },
-    methods: {
-      onTouchMove,
+    render() {
+      return (
+        <div onTouchmove={onTouchMove}>
+          <Overlay show lockScroll={false} />
+        </div>
+      );
     },
   });
 
-  wrapper.find('.van-overlay').trigger('touchmove');
-  expect(onTouchMove).toHaveBeenCalledTimes(0);
-
-  wrapper.setData({ lockScroll: false });
-  wrapper.find('.van-overlay').trigger('touchmove');
+  const overlay = wrapper.find('.van-overlay');
+  overlay.trigger('touchmove');
   expect(onTouchMove).toHaveBeenCalledTimes(1);
+});
+
+test('should not allow to touchmove when lock-scroll is true', async () => {
+  const onTouchMove = jest.fn();
+  const wrapper = mount({
+    render() {
+      return (
+        <div onTouchmove={onTouchMove}>
+          <Overlay show lockScroll />
+        </div>
+      );
+    },
+  });
+
+  const overlay = wrapper.find('.van-overlay');
+  overlay.trigger('touchmove');
+  expect(onTouchMove).toHaveBeenCalledTimes(0);
 });

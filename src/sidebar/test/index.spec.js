@@ -1,78 +1,106 @@
-import { mount } from '../../../test';
+import { ref } from 'vue';
+import { mount } from '@vue/test-utils';
 import Sidebar from '..';
+import SidebarItem from '../../sidebar-item';
 
-test('click event & change event', () => {
-  const onClick = jest.fn();
+test('should emit change event when active item changed', () => {
   const onChange = jest.fn();
   const wrapper = mount({
-    template: `
-      <van-sidebar @change="onChange">
-        <van-sidebar-item>Text</van-sidebar-item>
-        <van-sidebar-item @click="onClick">Text</van-sidebar-item>
-      </van-sidebar>
-    `,
-    methods: {
-      onClick,
-      onChange,
+    render() {
+      return (
+        <Sidebar onChange={onChange}>
+          <SidebarItem>Text</SidebarItem>
+          <SidebarItem>Text</SidebarItem>
+        </Sidebar>
+      );
     },
   });
 
-  wrapper.findAll('.van-sidebar-item').at(1).trigger('click');
-  expect(onClick).toHaveBeenCalledWith(1);
+  const items = wrapper.findAll('.van-sidebar-item');
+
+  items[0].trigger('click');
+  expect(onChange).toHaveBeenCalledTimes(0);
+
+  items[1].trigger('click');
   expect(onChange).toHaveBeenCalledWith(1);
-  wrapper.vm.$destroy();
 });
 
-test('v-model', () => {
-  const onChange = jest.fn();
+test('should emit click event when SidebarItem is clicked', () => {
+  const onClick = jest.fn();
   const wrapper = mount({
-    template: `
-      <van-sidebar v-model="active" @change="onChange">
-        <van-sidebar-item>Text</van-sidebar-item>
-        <van-sidebar-item>Text</van-sidebar-item>
-      </van-sidebar>
-    `,
-    data() {
-      return {
-        active: 0,
-      };
-    },
-    methods: {
-      onChange,
+    render() {
+      return (
+        <Sidebar>
+          <SidebarItem onClick={onClick}>Text</SidebarItem>
+        </Sidebar>
+      );
     },
   });
 
-  wrapper.findAll('.van-sidebar-item').at(1).trigger('click');
+  wrapper.find('.van-sidebar-item').trigger('click');
+  expect(onClick).toHaveBeenCalledWith(0);
+});
+
+test('should update v-model when active item changed', () => {
+  const onChange = jest.fn();
+  const wrapper = mount({
+    setup() {
+      return {
+        active: ref(0),
+      };
+    },
+    render() {
+      return (
+        <Sidebar v-model={this.active} onChange={onChange}>
+          <SidebarItem>Text</SidebarItem>
+          <SidebarItem>Text</SidebarItem>
+        </Sidebar>
+      );
+    },
+  });
+
+  wrapper.findAll('.van-sidebar-item')[1].trigger('click');
   expect(wrapper.vm.active).toEqual(1);
   expect(onChange).toHaveBeenCalledWith(1);
+  expect(onChange).toHaveBeenCalledTimes(1);
 });
 
-test('disabled prop', () => {
+test('should not update v-model when disabled SidebarItem is clicked', () => {
   const wrapper = mount({
-    template: `
-      <van-sidebar v-model="active">
-        <van-sidebar-item>Text</van-sidebar-item>
-        <van-sidebar-item disabled>Text</van-sidebar-item>
-      </van-sidebar>
-    `,
-    data() {
+    setup() {
       return {
-        active: 0,
+        active: ref(0),
       };
+    },
+    render() {
+      return (
+        <Sidebar v-model={this.active}>
+          <SidebarItem>Text</SidebarItem>
+          <SidebarItem disabled>Text</SidebarItem>
+        </Sidebar>
+      );
     },
   });
 
-  wrapper.findAll('.van-sidebar-item').at(1).trigger('click');
+  wrapper.findAll('.van-sidebar-item')[1].trigger('click');
   expect(wrapper.vm.active).toEqual(0);
 });
 
-test('without parent', () => {
-  const consoleError = console.error;
-  try {
-    console.error = jest.fn();
-    mount(Sidebar);
-  } catch (err) {
-    console.error = consoleError;
-    expect(err).toBeTruthy();
-  }
+test('should render title slot correctly', () => {
+  const wrapper = mount({
+    setup() {
+      return {
+        active: ref(0),
+      };
+    },
+    render() {
+      return (
+        <Sidebar v-model={this.active}>
+          <SidebarItem v-slots={{ title: () => 'Custom Title' }} />
+        </Sidebar>
+      );
+    },
+  });
+
+  expect(wrapper.html()).toMatchSnapshot();
 });

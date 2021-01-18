@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Form } from 'vant';
 
-Vue.use(Form);
+const app = createApp();
+app.use(Form);
 ```
 
 ## Usage
@@ -16,14 +17,14 @@ Vue.use(Form);
 ```html
 <van-form @submit="onSubmit">
   <van-field
-    v-model="username"
+    v-model="state.username"
     name="Username"
     label="Username"
     placeholder="Username"
     :rules="[{ required: true, message: 'Username is required' }]"
   />
   <van-field
-    v-model="password"
+    v-model="state.password"
     type="password"
     name="Password"
     label="Password"
@@ -31,7 +32,7 @@ Vue.use(Form);
     :rules="[{ required: true, message: 'Password is required' }]"
   />
   <div style="margin: 16px;">
-    <van-button round block type="info" native-type="submit">
+    <van-button round block type="primary" native-type="submit">
       Submit
     </van-button>
   </div>
@@ -39,17 +40,22 @@ Vue.use(Form);
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       username: '',
       password: '',
-    };
-  },
-  methods: {
-    onSubmit(values) {
+    });
+    const onSubmit = (values) => {
       console.log('submit', values);
-    },
+    };
+
+    return {
+      state,
+      onSubmit,
+    };
   },
 };
 ```
@@ -59,25 +65,25 @@ export default {
 ```html
 <van-form validate-first @failed="onFailed">
   <van-field
-    v-model="value1"
+    v-model="state.value1"
     name="pattern"
     placeholder="USe pattern"
     :rules="[{ pattern, message: 'Error message' }]"
   />
   <van-field
-    v-model="value2"
+    v-model="state.value2"
     name="validator"
     placeholder="Use validator"
     :rules="[{ validator, message: 'Error message' }]"
   />
   <van-field
-    v-model="value3"
+    v-model="state.value3"
     name="asyncValidator"
     placeholder="Use async validator"
     :rules="[{ validator: asyncValidator, message: 'Error message' }]"
   />
   <div style="margin: 16px;">
-    <van-button round block type="info" native-type="submit">
+    <van-button round block type="primary" native-type="submit">
       Submit
     </van-button>
   </div>
@@ -85,23 +91,22 @@ export default {
 ```
 
 ```js
+import { reactive } from 'vue';
 import { Toast } from 'vant';
 
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value1: '',
       value2: '',
       value3: '',
-      pattern: /\d{6}/,
-    };
-  },
-  methods: {
-    validator(val) {
-      return /1\d{10}/.test(val);
-    },
-    asyncValidator(val) {
-      return new Promise((resolve) => {
+    });
+    const pattern = /\d{6}/;
+
+    const validator = (val) => /1\d{10}/.test(val);
+
+    const asyncValidator = (val) =>
+      new Promise((resolve) => {
         Toast.loading('Validating...');
 
         setTimeout(() => {
@@ -109,10 +114,18 @@ export default {
           resolve(/\d{6}/.test(val));
         }, 1000);
       });
-    },
-    onFailed(errorInfo) {
+
+    const onFailed = (errorInfo) => {
       console.log('failed', errorInfo);
-    },
+    };
+
+    return {
+      state,
+      pattern,
+      onFailed,
+      validator,
+      asyncValidator,
+    };
   },
 };
 ```
@@ -122,17 +135,18 @@ export default {
 ```html
 <van-field name="switch" label="Switch">
   <template #input>
-    <van-switch v-model="switchChecked" size="20" />
+    <van-switch v-model="checked" size="20" />
   </template>
 </van-field>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      switchChecked: false,
-    };
+  setup() {
+    const checked = ref(false);
+    return { checked };
   },
 };
 ```
@@ -142,12 +156,12 @@ export default {
 ```html
 <van-field name="checkbox" label="Checkbox">
   <template #input>
-    <van-checkbox v-model="checkbox" shape="square" />
+    <van-checkbox v-model="checked" shape="square" />
   </template>
 </van-field>
 <van-field name="checkboxGroup" label="CheckboxGroup">
   <template #input>
-    <van-checkbox-group v-model="checkboxGroup" direction="horizontal">
+    <van-checkbox-group v-model="groupChecked" direction="horizontal">
       <van-checkbox name="1" shape="square">Checkbox 1</van-checkbox>
       <van-checkbox name="2" shape="square">Checkbox 2</van-checkbox>
     </van-checkbox-group>
@@ -156,11 +170,15 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
+  setup() {
+    const checked = ref(false);
+    const groupChecked = ref([]);
     return {
-      checkbox: false,
-      checkboxGroup: [],
+      checked,
+      groupChecked,
     };
   },
 };
@@ -171,7 +189,7 @@ export default {
 ```html
 <van-field name="radio" label="Radio">
   <template #input>
-    <van-radio-group v-model="radio" direction="horizontal">
+    <van-radio-group v-model="checked" direction="horizontal">
       <van-radio name="1">Radio 1</van-radio>
       <van-radio name="2">Radio 2</van-radio>
     </van-radio-group>
@@ -180,11 +198,12 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      radio: '1',
-    };
+  setup() {
+    const checked = ref('1');
+    return { checked };
   },
 };
 ```
@@ -194,17 +213,18 @@ export default {
 ```html
 <van-field name="stepper" label="Stepper">
   <template #input>
-    <van-stepper v-model="stepper" />
+    <van-stepper v-model="value" />
   </template>
 </van-field>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      stepper: 1,
-    };
+  setup() {
+    const value = ref(1);
+    return { value };
   },
 };
 ```
@@ -214,17 +234,18 @@ export default {
 ```html
 <van-field name="rate" label="Rate">
   <template #input>
-    <van-rate v-model="rate" />
+    <van-rate v-model="value" />
   </template>
 </van-field>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      rate: 3,
-    };
+  setup() {
+    const value = ref(3);
+    return { value };
   },
 };
 ```
@@ -234,17 +255,18 @@ export default {
 ```html
 <van-field name="slider" label="Slider">
   <template #input>
-    <van-slider v-model="slider" />
+    <van-slider v-model="value" />
   </template>
 </van-field>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      slider: 50,
-    };
+  setup() {
+    const value = ref(50);
+    return { value };
   },
 };
 ```
@@ -254,17 +276,18 @@ export default {
 ```html
 <van-field name="uploader" label="Uploader">
   <template #input>
-    <van-uploader v-model="uploader" />
+    <van-uploader v-model="value" />
   </template>
 </van-field>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
-    };
+  setup() {
+    const value = ref([{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }]);
+    return { value };
   },
 };
 ```
@@ -273,38 +296,44 @@ export default {
 
 ```html
 <van-field
+  v-model="state.value"
   readonly
   clickable
   name="picker"
-  :value="value"
   label="Picker"
   placeholder="Select city"
-  @click="showPicker = true"
+  @click="state.showPicker = true"
 />
-<van-popup v-model="showPicker" position="bottom">
+<van-popup v-model:show="state.showPicker" position="bottom">
   <van-picker
-    show-toolbar
     :columns="columns"
     @confirm="onConfirm"
-    @cancel="showPicker = false"
+    @cancel="state.showPicker = false"
   />
 </van-popup>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value: '',
-      columns: ['Delaware', 'Florida', 'Georqia', 'Indiana', 'Maine'],
       showPicker: false,
+    });
+    const columns = ['Delaware', 'Florida', 'Georqia', 'Indiana', 'Maine'];
+
+    const onConfirm = (value) => {
+      state.value = value;
+      state.showPicker = false;
     };
-  },
-  methods: {
-    onConfirm(value) {
-      this.value = value;
-      this.showPicker = false;
-    },
+
+    return {
+      state,
+      columns,
+      onConfirm,
+    };
   },
 };
 ```
@@ -313,36 +342,41 @@ export default {
 
 ```html
 <van-field
+  v-model="state.value"
   readonly
   clickable
   name="datetimePicker"
-  :value="value"
   label="Datetime Picker"
   placeholder="Select time"
-  @click="showPicker = true"
+  @click="state.showPicker = true"
 />
-<van-popup v-model="showPicker" position="bottom">
+<van-popup v-model:show="state.showPicker" position="bottom">
   <van-datetime-picker
     type="time"
     @confirm="onConfirm"
-    @cancel="showPicker = false"
+    @cancel="state.showPicker = false"
   />
 </van-popup>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value: '',
       showPicker: false,
+    });
+    const onConfirm = (value) => {
+      state.value = value;
+      state.showPicker = false;
     };
-  },
-  methods: {
-    onConfirm(time) {
-      this.value = time;
-      this.showPicker = false;
-    },
+
+    return {
+      state,
+      onConfirm,
+    };
   },
 };
 ```
@@ -351,37 +385,45 @@ export default {
 
 ```html
 <van-field
+  v-model="state.value"
   readonly
   clickable
   name="area"
-  :value="value"
   label="Area Picker"
   placeholder="Select area"
-  @click="showArea = true"
+  @click="state.showArea = true"
 />
-<van-popup v-model="showArea" position="bottom">
+<van-popup v-model:show="state.showArea" position="bottom">
   <van-area
     :area-list="areaList"
     @confirm="onConfirm"
-    @cancel="showArea = false"
+    @cancel="state.showArea = false"
   />
 </van-popup>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value: '',
       showArea: false,
-      areaList: {},
+    });
+    const onConfirm = (value) => {
+      state.showArea = false;
+      state.value = values
+        .filter((item) => !!item)
+        .map((item) => item.name)
+        .join('/');
     };
-  },
-  methods: {
-    onConfirm(values) {
-      this.value = values.map((item) => item.name).join('/');
-      this.showArea = false;
-    },
+
+    return {
+      state,
+      areaList: {},
+      onConfirm,
+    };
   },
 };
 ```
@@ -390,30 +432,35 @@ export default {
 
 ```html
 <van-field
+  v-model="state.value"
   readonly
   clickable
   name="calendar"
-  :value="value"
   label="Calendar"
   placeholder="Select date"
-  @click="showCalendar = true"
+  @click="state.showCalendar = true"
 />
-<van-calendar v-model="showCalendar" @confirm="onConfirm" />
+<van-calendar v-model="state.showCalendar" @confirm="onConfirm" />
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       value: '',
       showCalendar: false,
+    });
+    const onConfirm = (date) => {
+      state.value = `${date.getMonth() + 1}/${date.getDate()}`;
+      state.showCalendar = false;
     };
-  },
-  methods: {
-    onConfirm(date) {
-      this.value = `${date.getMonth() + 1}/${date.getDate()}`;
-      this.showCalendar = false;
-    },
+
+    return {
+      state,
+      onConfirm,
+    };
   },
 };
 ```
@@ -428,42 +475,52 @@ export default {
 | label-align | Field label align, can be set to `center` `right` | _string_ | `left` |
 | input-align | Field input align, can be set to `center` `right` | _string_ | `left` |
 | error-message-align | Error message align, can be set to `center` `right` | _string_ | `left` |
-| validate-trigger `v2.5.2` | When to validate the form，can be set to `onChange`、`onSubmit` | _string_ | `onBlur` |
+| validate-trigger | When to validate the form，can be set to `onChange`、`onSubmit` | _string_ | `onBlur` |
 | colon | Whether to display colon after label | _boolean_ | `false` |
+| disabled | Whether to disable form | _boolean_ | `false` |
+| readonly | Whether to be readonly | _boolean_ | `false` |
 | validate-first | Whether to stop the validation when a rule fails | _boolean_ | `false` |
-| scroll-to-error `v2.5.2` | Whether to scroll to the error field when validation failed | _boolean_ | `false` |
-| show-error `v2.6.0` | Whether to highlight input when validation failed | _boolean_ | `true` |
-| show-error-message `v2.5.8` | Whether to show error message when validation failed | _boolean_ | `true` |
-| submit-on-enter `v2.8.3` | Whether to submit form on enter | _boolean_ | `true` |
+| scroll-to-error | Whether to scroll to the error field when validation failed | _boolean_ | `false` |
+| show-error | Whether to highlight input when validation failed | _boolean_ | `true` |
+| show-error-message | Whether to show error message when validation failed | _boolean_ | `true` |
+| submit-on-enter | Whether to submit form on enter | _boolean_ | `true` |
 
 ### Data Structure of Rule
 
 | Key | Description | Type |
 | --- | --- | --- |
 | required | Whether to be a required field | _boolean_ |
-| message `v2.5.3` | Error message | _string \| (value, rule) => string_ |
-| validator `v2.5.3` | Custom validator | _(value, rule) => boolean \| Promise_ |
-| pattern `v2.5.3` | Regex pattern | _RegExp_ |
-| trigger `v2.5.2` | When to validate the form，can be set to `onChange`、`onBlur` | _string_ |
-| formatter `v2.5.3` | Format value before validate | _(value, rule) => any_ |
+| message | Error message | _string \| (value, rule) => string_ |
+| validator | Custom validator | _(value, rule) => boolean \| Promise_ |
+| pattern | Regex pattern | _RegExp_ |
+| trigger | When to validate the form，can be set to `onChange`、`onBlur` | _string_ |
+| formatter | Format value before validate | _(value, rule) => any_ |
+
+### validate-trigger
+
+| Value    | Description                                                     |
+| -------- | --------------------------------------------------------------- |
+| onSubmit | Trigger validation after submiting form                         |
+| onBlur   | Trigger validation after submiting form or bluring input        |
+| onChange | Trigger validation after submiting form or changing input value |
 
 ### Events
 
 | Event | Description | Arguments |
 | --- | --- | --- |
-| submit | Triggered after submitting the form and validation passed | _values: object_ |
-| failed | Triggered after submitting the form and validation failed | _errorInfo: { values: object, errors: object[] }_ |
+| submit | Emitted after submitting the form and validation passed | _values: object_ |
+| failed | Emitted after submitting the form and validation failed | _errorInfo: { values: object, errors: object[] }_ |
 
 ### Methods
 
-Use [ref](https://vuejs.org/v2/api/#ref) to get Form instance and call instance methods
+Use [ref](https://v3.vuejs.org/guide/component-template-refs.html) to get Form instance and call instance methods.
 
 | Name | Description | Attribute | Return value |
 | --- | --- | --- | --- |
 | submit | Submit form | - | - |
-| validate | Validate form | _name?: string_ | _Promise_ |
-| resetValidation | Reset validation | _name?: string_ | - |
-| scrollToField `v2.8.3` | Scroll to field | _name: string, alignToTop: boolean_ | - |
+| validate | Validate form | _name?: string \| string[]_ | _Promise_ |
+| resetValidation | Reset validation | _name?: string \| string[]_ | - |
+| scrollToField | Scroll to field | _name: string, alignToTop: boolean_ | - |
 
 ### Slots
 

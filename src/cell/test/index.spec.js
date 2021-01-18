@@ -1,53 +1,68 @@
 import Cell from '..';
-import CellGroup from '../../cell-group';
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 
-test('click event', () => {
-  const click = jest.fn();
+test('should render default slot correctly', () => {
   const wrapper = mount(Cell, {
-    context: {
-      on: {
-        click,
-      },
+    slots: {
+      default: () => 'Custom Default',
     },
   });
-
-  wrapper.trigger('click');
-  expect(click).toHaveBeenCalled();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('arrow direction', () => {
+test('should render title slot correctly', () => {
   const wrapper = mount(Cell, {
-    propsData: {
+    slots: {
+      title: () => 'Custom Title',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render label slot correctly', () => {
+  const wrapper = mount(Cell, {
+    props: {
+      title: 'Title',
+    },
+    slots: {
+      label: () => 'Custom Label',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render icon slot correctly', () => {
+  const wrapper = mount(Cell, {
+    slots: {
+      icon: () => 'Custom Icon',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render extra slot correctly', () => {
+  const wrapper = mount(Cell, {
+    slots: {
+      extra: () => 'Custom Extra',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should change arrow direction when using arrow-direction prop', () => {
+  const wrapper = mount(Cell, {
+    props: {
       isLink: true,
       arrowDirection: 'down',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-cell__right-icon').html()).toMatchSnapshot();
 });
 
-test('render slot', () => {
-  const wrapper = mount({
-    template: `
-      <cell>
-        <template v-slot:icon>Custom Icon</template>
-        <template v-slot:title>Custom Title</template>
-        <template v-slot:label>Custom Label</template>
-        <template v-slot:extra>Custom Extra</template>
-      </cell>
-    `,
-    components: {
-      Cell,
-    },
-  });
-
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('title-style prop', () => {
+test('should change title style when using title-style prop', () => {
   const wrapper = mount(Cell, {
-    propsData: {
+    props: {
       title: 'title',
       titleStyle: {
         color: 'red',
@@ -55,26 +70,26 @@ test('title-style prop', () => {
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-cell__title').element.style.color).toEqual('red');
 });
 
-test('CellGroup title slot', () => {
-  const wrapper = mount(CellGroup, {
-    scopedSlots: {
-      title: () => 'CustomTitle',
-    },
-  });
-
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('icon-prefix prop', () => {
+test('should change icon class prefix when using icon-prefix prop', () => {
   const wrapper = mount(Cell, {
-    propsData: {
-      iconPrefix: 'my-icon',
+    props: {
       icon: 'success',
+      iconPrefix: 'my-icon',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should allow to disable clicakble when using is-link prop', () => {
+  const wrapper = mount(Cell, {
+    props: {
+      isLink: true,
+      clickable: false,
+    },
+  });
+  expect(wrapper.classes()).not.toContain('van-cell--clickable');
 });

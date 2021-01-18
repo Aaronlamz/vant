@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Notify } from 'vant';
 
-Vue.use(Notify);
+const app = createApp();
+app.use(Notify);
 ```
 
 ## Usage
@@ -43,7 +44,7 @@ Notify({
 
 ### Global Method
 
-After import the Notify component, the `$notify` method is automatically mounted on Vue.prototype, making it easy to call within a vue component.
+After registering the Notify component through `app.use`, the `$notify` method will be automatically mounted on all subcomponents of the app.
 
 ```js
 export default {
@@ -57,26 +58,30 @@ export default {
 
 ```html
 <van-button type="primary" text="Component Call" @click="showNotify" />
-<van-notify v-model="show" type="success">
+<van-notify v-model:show="show" type="success">
   <van-icon name="bell" style="margin-right: 4px;" />
   <span>Content</span>
 </van-notify>
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      show: false,
-    };
-  },
-  methods: {
-    showNotify() {
-      this.show = true;
+  setup() {
+    const show = ref(false);
+
+    const showNotify = () => {
+      show.value = true;
       setTimeout(() => {
-        this.show = false;
+        show.value = false;
       }, 2000);
-    },
+    };
+
+    return {
+      show,
+      showNotify,
+    };
   },
 };
 ```
@@ -96,12 +101,27 @@ export default {
 
 | Attribute | Description | Type | Default |
 | --- | --- | --- | --- |
-| type `v2.1.6` | Can be set to `primary` `success` `warning` | _string_ | `danger` |
+| type | Can be set to `primary` `success` `warning` | _string_ | `danger` |
 | message | Message | _string_ | - |
 | duration | Duration(ms), won't disappear if value is 0 | _number \| string_ | `3000` |
 | color | Message color | _string_ | `white` |  |
 | background | Background color | _string_ | - |
-| className | Custom className | _any_ | - |
+| className | Custom className | _string \| Array \| object_ | - |
 | onClick | Callback function after click | _Function_ | - |
 | onOpened | Callback function after opened | _Function_ | - |
 | onClose | Callback function after close | _Function_ | - |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name                             | Default Value             | Description |
+| -------------------------------- | ------------------------- | ----------- |
+| @notify-text-color               | `@white`                  | -           |
+| @notify-padding                  | `@padding-xs @padding-md` | -           |
+| @notify-font-size                | `@font-size-md`           | -           |
+| @notify-line-height              | `@line-height-md`         | -           |
+| @notify-primary-background-color | `@blue`                   | -           |
+| @notify-success-background-color | `@green`                  | -           |
+| @notify-danger-background-color  | `@red`                    | -           |
+| @notify-warning-background-color | `@orange`                 | -           |

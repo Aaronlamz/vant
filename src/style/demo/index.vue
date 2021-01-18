@@ -1,72 +1,74 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('ellipsis')">
-      <div class="van-ellipsis">{{ t('text1') }}</div>
-      <div class="van-multi-ellipsis--l2">{{ t('text2') }}</div>
-    </demo-block>
+  <demo-block :title="t('ellipsis')">
+    <div class="van-ellipsis">{{ t('text1') }}</div>
+    <div class="van-multi-ellipsis--l2">{{ t('text2') }}</div>
+  </demo-block>
 
-    <demo-block card :title="t('hairline')">
-      <div class="van-hairline--top" />
-    </demo-block>
+  <demo-block card :title="t('hairline')">
+    <div class="van-hairline--top" />
+  </demo-block>
 
-    <demo-block card :title="t('animation')">
-      <van-cell is-link title="Fade" @click="animate('van-fade')" />
-      <van-cell is-link title="Slide Up" @click="animate('van-slide-up')" />
-      <van-cell is-link title="Slide Down" @click="animate('van-slide-down')" />
-      <van-cell is-link title="Slide Left" @click="animate('van-slide-left')" />
-      <van-cell
-        is-link
-        title="Slide Right"
-        @click="animate('van-slide-right')"
-      />
-    </demo-block>
+  <demo-block card :title="t('animation')">
+    <van-cell is-link title="Fade" @click="animate('van-fade')" />
+    <van-cell is-link title="Slide Up" @click="animate('van-slide-up')" />
+    <van-cell is-link title="Slide Down" @click="animate('van-slide-down')" />
+    <van-cell is-link title="Slide Left" @click="animate('van-slide-left')" />
+    <van-cell is-link title="Slide Right" @click="animate('van-slide-right')" />
+  </demo-block>
 
-    <transition :name="transitionName">
-      <div v-show="show" class="demo-animate-block" />
-    </transition>
-  </demo-section>
+  <transition :name="transitionName">
+    <div v-show="show" class="demo-animate-block" />
+  </transition>
 </template>
 
-<script>
-export default {
-  i18n: {
-    'zh-CN': {
-      hairline: '1px 边框',
-      ellipsis: '文字省略',
-      animation: '动画',
-      toggle: '切换动画',
-      text1: '这是一段最多显示一行的文字，后面的内容会省略',
-      text2:
-        '这是一段最多显示两行的文字，后面的内容会省略。这是一段最多显示两行的文字，后面的内容会省略',
-    },
-    'en-US': {
-      hairline: 'Hairline',
-      ellipsis: 'Text Ellipsis',
-      animation: 'Animation',
-      toggle: 'Switch animation',
-      text1:
-        'This is a paragraph that displays up to one line of text, and the rest of the text will be omitted.',
-      text2:
-        'This is a paragraph that displays up to two lines of text, and the rest of the text will be omitted.',
-    },
-  },
+<script lang="ts">
+import { reactive, toRefs } from 'vue';
+import { useTranslate } from '@demo/use-translate';
 
-  data() {
-    return {
+const i18n = {
+  'zh-CN': {
+    hairline: '1px 边框',
+    ellipsis: '文字省略',
+    animation: '动画',
+    toggle: '切换动画',
+    text1: '这是一段最多显示一行的文字，后面的内容会省略',
+    text2:
+      '这是一段最多显示两行的文字，后面的内容会省略。这是一段最多显示两行的文字，后面的内容会省略',
+  },
+  'en-US': {
+    hairline: 'Hairline',
+    ellipsis: 'Text Ellipsis',
+    animation: 'Animation',
+    toggle: 'Switch animation',
+    text1:
+      'This is a paragraph that displays up to one line of text, and the rest of the text will be omitted.',
+    text2:
+      'This is a paragraph that displays up to two lines of text, and the rest of the text will be omitted.',
+  },
+};
+
+export default {
+  setup() {
+    const t = useTranslate(i18n);
+    const state = reactive({
       show: false,
       transitionName: '',
-    };
-  },
+    });
 
-  methods: {
-    animate(transitionName) {
-      this.show = true;
-      this.transitionName = transitionName;
+    const animate = (transitionName: string) => {
+      state.show = true;
+      state.transitionName = transitionName;
 
       setTimeout(() => {
-        this.show = false;
+        state.show = false;
       }, 500);
-    },
+    };
+
+    return {
+      ...toRefs(state),
+      t,
+      animate,
+    };
   },
 };
 </script>
@@ -104,7 +106,7 @@ export default {
     height: 100px;
     margin: -50px 0 0 -50px;
     background-color: @blue;
-    border-radius: 3px;
+    border-radius: 8px;
   }
 }
 </style>

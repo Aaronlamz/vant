@@ -1,158 +1,131 @@
-import Vue from 'vue';
-import Dialog from '..';
-import DialogComponent from '../Dialog';
-import { mount, later, trigger } from '../../../test';
+import Dialog from '../Dialog';
+import { mount } from '../../../test';
 
-test('Dialog function call', async () => {
-  Dialog.close();
-  Dialog.alert({
-    message: '1',
-    showCancelButton: true,
-  });
-
-  await later();
-
-  const callback = jest.fn();
-  const dialog = document.querySelector('.van-dialog');
-
-  expect(dialog.style.display).toEqual('');
-  Dialog.close();
-
-  await later();
-  expect(dialog.style.display).toEqual('none');
-  Dialog.confirm().catch(callback);
-  document.querySelector('.van-dialog__cancel').click();
-
-  await later();
-  expect(callback).toHaveBeenCalledWith('cancel');
-  Dialog.confirm().then(callback);
-  document.querySelector('.van-dialog__confirm').click();
-
-  await later();
-  expect(callback).toHaveBeenNthCalledWith(2, 'confirm');
-});
-
-test('before close', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
+test('should allow to intercept closing action with before-close prop', async () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
       showCancelButton: true,
-      closeOnClickOverlay: true,
-      beforeClose: (action, done) => done(false),
+      beforeClose: (action) => action === 'cancel',
     },
   });
+
+  const confirm = wrapper.find('.van-dialog__confirm');
+  confirm.trigger('click');
+  expect(wrapper.emitted('update:show')).toBeFalsy();
 
   const cancel = wrapper.find('.van-dialog__cancel');
-
   cancel.trigger('click');
-  expect(wrapper.emitted('input')).toBeFalsy();
-
-  wrapper.setProps({
-    beforeClose: (action, done) => {
-      if (action === 'cancel') {
-        done();
-      }
-    },
-  });
-
-  const overlay = document.querySelector('.van-overlay');
-  trigger(overlay, 'click');
-  expect(wrapper.emitted('input')).toBeFalsy();
-
-  cancel.trigger('click');
-  expect(wrapper.emitted('input')[0]).toBeTruthy();
+  expect(wrapper.emitted('update:show')).toBeTruthy();
 });
 
-test('set default options', () => {
-  Dialog.setDefaultOptions({ lockScroll: false });
-  expect(Dialog.currentOptions.lockScroll).toBeFalsy();
-  Dialog.resetDefaultOptions();
-  expect(Dialog.currentOptions.lockScroll).toBeTruthy();
-});
-
-test('register component', () => {
-  Vue.use(Dialog);
-  expect(Vue.component(DialogComponent.name)).toBeTruthy();
-});
-
-test('button color', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
-      showCancelButton: true,
-      cancelButtonColor: 'white',
+test('should change confirm button color when using confirm-button-color prop', () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
       confirmButtonColor: 'red',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  const confirmButton = wrapper.find('.van-dialog__confirm');
+  expect(confirmButton.element.style.color).toEqual('red');
 });
 
-test('button text', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
+test('should change cancel button color when using cancel-button-color prop', () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
       showCancelButton: true,
-      cancelButtonText: 'Custom cancel',
-      confirmButtonText: 'Custom confirm',
+      cancelButtonColor: 'red',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  const cancelButton = wrapper.find('.van-dialog__cancel');
+  expect(cancelButton.element.style.color).toEqual('red');
 });
 
-test('dialog component', () => {
-  expect(Dialog.Component).toEqual(DialogComponent);
-});
-
-test('default slot', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
+test('should render button text correctly', () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
+      showCancelButton: true,
+      cancelButtonText: 'Custom Cancel',
+      confirmButtonText: 'Custom Confirm',
     },
-    scopedSlots: {
+  });
+  expect(wrapper.find('.van-dialog__footer').html()).toMatchSnapshot();
+});
+
+test('should render default slot correctly', () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
+    },
+    slots: {
       default: () => 'Custom Message',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-dialog__content').html()).toMatchSnapshot();
 });
 
-test('title slot', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
+test('should render title slot correctly', () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
     },
-    scopedSlots: {
+    slots: {
       title: () => 'Custom Title',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-dialog__header').html()).toMatchSnapshot();
 });
 
-test('allow-html prop', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
-      message: '<span>text</span>',
+test('should render message as html when using allow-html prop', async () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
+      message: '<span class="foo">text</span>',
       allowHtml: false,
     },
   });
-  expect(wrapper.find('.van-dialog__message')).toMatchSnapshot();
+
+  expect(wrapper.find('.foo').exists()).toBeFalsy();
+
+  await wrapper.setProps({ allowHtml: true });
+  expect(wrapper.find('.foo').exists()).toBeTruthy();
 });
 
-test('open & close event', () => {
-  const wrapper = mount(DialogComponent);
-  wrapper.vm.value = true;
-  expect(wrapper.emitted('open')).toBeTruthy();
-  wrapper.vm.value = false;
-  expect(wrapper.emitted('close')).toBeTruthy();
+test('should emit open event when show prop is set to true', async () => {
+  const onOpen = jest.fn();
+  const wrapper = mount(Dialog, {
+    props: {
+      onOpen,
+    },
+  });
+
+  await wrapper.setProps({ show: true });
+  expect(onOpen).toHaveBeenCalledTimes(1);
 });
 
-test('width prop', () => {
-  const wrapper = mount(DialogComponent, {
-    propsData: {
-      value: true,
+test('should emit close event when show prop is set to false', async () => {
+  const onClose = jest.fn();
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
+      onClose,
+    },
+  });
+
+  await wrapper.setProps({ show: false });
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test('should update width when using width prop', async () => {
+  const wrapper = mount(Dialog, {
+    props: {
+      show: true,
       width: 200,
     },
   });
 
-  expect(wrapper.element.style.width).toEqual('200px');
+  const dialog = wrapper.find('.van-dialog').element;
+  expect(dialog.style.width).toEqual('200px');
 });

@@ -1,6 +1,11 @@
 import { ConfigAPI } from '@babel/core';
 
-module.exports = function(api?: ConfigAPI) {
+type PresetOption = {
+  loose?: boolean;
+  enableObjectSlots?: boolean;
+};
+
+module.exports = function (api?: ConfigAPI, options: PresetOption = {}) {
   if (api) {
     api.cache.never();
   }
@@ -14,17 +19,12 @@ module.exports = function(api?: ConfigAPI) {
       [
         '@babel/preset-env',
         {
-          loose: true,
           modules: useESModules ? false : 'commonjs',
-        },
-      ],
-      [
-        '@vue/babel-preset-jsx',
-        {
-          functional: false,
+          loose: options.loose,
         },
       ],
       '@babel/preset-typescript',
+      require('../compiler/babel-preset-vue-ts'),
     ],
     plugins: [
       [
@@ -42,6 +42,12 @@ module.exports = function(api?: ConfigAPI) {
           style: true,
         },
         'vant',
+      ],
+      [
+        '@vue/babel-plugin-jsx',
+        {
+          enableObjectSlots: options.enableObjectSlots,
+        },
       ],
       '@babel/plugin-transform-object-assign',
     ],

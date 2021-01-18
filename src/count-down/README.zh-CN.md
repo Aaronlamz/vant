@@ -1,37 +1,43 @@
 # CountDown 倒计时
 
+### 介绍
+
+用于实时展示倒计时数值，支持毫秒精度。
+
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { CountDown } from 'vant';
 
-Vue.use(CountDown);
+const app = createApp();
+app.use(CountDown);
 ```
 
 ## 代码演示
 
 ### 基础用法
 
-`time`属性表示倒计时总时长，单位为毫秒
+`time` 属性表示倒计时总时长，单位为毫秒。
 
 ```html
 <van-count-down :time="time" />
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      time: 30 * 60 * 60 * 1000,
-    };
+  setup() {
+    const time = ref(30 * 60 * 60 * 1000);
+    return { time };
   },
 };
 ```
 
 ### 自定义格式
 
-通过`format`属性设置倒计时文本的内容
+通过 `format` 属性设置倒计时文本的内容。
 
 ```html
 <van-count-down :time="time" format="DD 天 HH 时 mm 分 ss 秒" />
@@ -39,7 +45,7 @@ export default {
 
 ### 毫秒级渲染
 
-倒计时默认每秒渲染一次，设置`millisecond`属性可以开启毫秒级渲染
+倒计时默认每秒渲染一次，设置 `millisecond` 属性可以开启毫秒级渲染。
 
 ```html
 <van-count-down millisecond :time="time" format="HH:mm:ss:SS" />
@@ -47,11 +53,11 @@ export default {
 
 ### 自定义样式
 
-通过插槽自定义倒计时的样式，`timeData`对象格式见下方表格
+通过插槽自定义倒计时的样式，`timeData` 对象格式见下方表格。
 
 ```html
 <van-count-down :time="time">
-  <template v-slot="timeData">
+  <template #default="timeData">
     <span class="block">{{ timeData.hours }}</span>
     <span class="colon">:</span>
     <span class="block">{{ timeData.minutes }}</span>
@@ -79,7 +85,7 @@ export default {
 
 ### 手动控制
 
-通过 ref 获取到组件实例后，可以调用`start`、`pause`、`reset`方法
+通过 ref 获取到组件实例后，可以调用 `start`、`pause`、`reset` 方法。
 
 ```html
 <van-count-down
@@ -88,7 +94,7 @@ export default {
   :time="3000"
   :auto-start="false"
   format="ss:SSS"
-  @finish="finish"
+  @finish="onFinish"
 />
 <van-grid clickable>
   <van-grid-item text="开始" icon="play-circle-o" @click="start" />
@@ -101,19 +107,29 @@ export default {
 import { Toast } from 'vant';
 
 export default {
-  methods: {
-    start() {
-      this.$refs.countDown.start();
-    },
-    pause() {
-      this.$refs.countDown.pause();
-    },
-    reset() {
-      this.$refs.countDown.reset();
-    },
-    finish() {
+  setup() {
+    const countDown = ref(null);
+
+    const start = () => {
+      countDown.value.start();
+    };
+    const pause = () => {
+      countDown.value.pause();
+    };
+    const reset = () => {
+      countDown.value.reset();
+    };
+    const onFinish = () => {
       Toast('倒计时结束');
-    },
+    };
+
+    return {
+      start,
+      pause,
+      reset,
+      onFinish,
+      countDown,
+    };
   },
 };
 ```
@@ -143,36 +159,47 @@ export default {
 
 ### Events
 
-| 事件名          | 说明             | 回调参数             |
-| --------------- | ---------------- | -------------------- |
-| finish          | 倒计时结束时触发 | -                    |
-| change `v2.4.4` | 倒计时变化时触发 | _timeData: TimeData_ |
+| 事件名 | 说明             | 回调参数                   |
+| ------ | ---------------- | -------------------------- |
+| finish | 倒计时结束时触发 | -                          |
+| change | 倒计时变化时触发 | _currentTime: CurrentTime_ |
 
 ### Slots
 
-| 名称    | 说明       | SlotProps            |
-| ------- | ---------- | -------------------- |
-| default | 自定义内容 | _timeData: TimeData_ |
+| 名称    | 说明       | 参数                       |
+| ------- | ---------- | -------------------------- |
+| default | 自定义内容 | _currentTime: CurrentTime_ |
 
-### TimeData 格式
+### CurrentTime 格式
 
-| 名称         | 说明     | 类型     |
-| ------------ | -------- | -------- |
-| days         | 剩余天数 | _number_ |
-| hours        | 剩余小时 | _number_ |
-| minutes      | 剩余分钟 | _number_ |
-| seconds      | 剩余秒数 | _number_ |
-| milliseconds | 剩余毫秒 | _number_ |
+| 名称         | 说明                   | 类型     |
+| ------------ | ---------------------- | -------- |
+| total        | 剩余总时间（单位毫秒） | _number_ |
+| days         | 剩余天数               | _number_ |
+| hours        | 剩余小时               | _number_ |
+| minutes      | 剩余分钟               | _number_ |
+| seconds      | 剩余秒数               | _number_ |
+| milliseconds | 剩余毫秒               | _number_ |
 
 ### 方法
 
-通过 ref 可以获取到 CountDown 实例并调用实例方法，详见[组件实例方法](#/zh-CN/quickstart#zu-jian-shi-li-fang-fa)
+通过 ref 可以获取到 CountDown 实例并调用实例方法，详见[组件实例方法](#/zh-CN/advanced-usage#zu-jian-shi-li-fang-fa)。
 
 | 方法名 | 说明 | 参数 | 返回值 |
 | --- | --- | --- | --- |
 | start | 开始倒计时 | - | - |
 | pause | 暂停倒计时 | - | - |
-| reset | 重设倒计时，若`auto-start`为`true`，重设后会自动开始倒计时 | - | - |
+| reset | 重设倒计时，若 `auto-start` 为 `true`，重设后会自动开始倒计时 | - | - |
+
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                    | 默认值            | 描述 |
+| ----------------------- | ----------------- | ---- |
+| @count-down-text-color  | `@text-color`     | -    |
+| @count-down-font-size   | `@font-size-md`   | -    |
+| @count-down-line-height | `@line-height-md` | -    |
 
 ## 常见问题
 

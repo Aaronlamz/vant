@@ -19,9 +19,13 @@ const DEFAULT_CONFIG = {
     '\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(@vant/cli))/'],
-  snapshotSerializers: ['jest-serializer-vue'],
+  snapshotSerializers: ['jest-serializer-html'],
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx,vue}', '!**/demo/**'],
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx,vue}',
+    '!**/demo/**',
+    '!**/test/**',
+  ],
   coverageReporters: ['html', 'lcov', 'text-summary'],
   coverageDirectory: './test/coverage',
 };

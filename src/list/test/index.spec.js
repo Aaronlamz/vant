@@ -1,58 +1,40 @@
 import List from '..';
 import { mount, later, mockGetBoundingClientRect } from '../../../test';
 
-test('load event', async () => {
+test('should emit load event when reaching bottom', async () => {
   const wrapper = mount(List);
-
-  wrapper.vm.$on('input', (value) => {
-    wrapper.vm.loading = value;
-  });
 
   await later();
   expect(wrapper.emitted('load')).toBeTruthy();
-  expect(wrapper.emitted('input')).toBeTruthy();
-
-  wrapper.vm.loading = false;
-
-  await later();
-  expect(wrapper.emitted('input')[1]).toBeTruthy();
-  wrapper.destroy();
+  expect(wrapper.emitted('update:loading')).toBeTruthy();
+  wrapper.unmount();
 });
 
-test('error loaded, click error-text and reload', async () => {
+test('should reload after clicking the error text', async () => {
   const wrapper = mount(List, {
-    propsData: {
-      errorText: 'Request failed. Click to reload...',
+    props: {
       error: true,
+      errorText: 'Request failed. Click to reload...',
     },
   });
 
   await later();
 
   expect(wrapper.emitted('load')).toBeFalsy();
-  expect(wrapper.emitted('input')).toBeFalsy();
-
-  // simulate the behavior of clicking error-text
-  wrapper.vm.$on('update:error', (val) => {
-    wrapper.setProps({
-      error: val,
-    });
-  });
+  expect(wrapper.emitted('update:loading')).toBeFalsy();
 
   wrapper.find('.van-list__error-text').trigger('click');
+  expect(wrapper.emitted('update:error')[0][0]).toEqual(false);
 
+  await wrapper.setProps({ error: false });
   await later();
-
-  expect(wrapper.vm.$props.error).toBeFalsy();
   expect(wrapper.emitted('load')).toBeTruthy();
-  expect(wrapper.emitted('input')).toBeTruthy();
-
-  wrapper.destroy();
+  expect(wrapper.emitted('update:loading')).toBeTruthy();
 });
 
-test('finished', async () => {
+test('should render finished text when finished prop is true', async () => {
   const wrapper = mount(List, {
-    propsData: {
+    props: {
       finished: true,
       finishedText: 'Finished',
     },
@@ -60,100 +42,95 @@ test('finished', async () => {
 
   await later();
   expect(wrapper.emitted('load')).toBeFalsy();
-  expect(wrapper.emitted('input')).toBeFalsy();
-  expect(wrapper.contains('.van-list__finished-text')).toBeTruthy();
-  wrapper.vm.finished = false;
+  expect(wrapper.emitted('update:loading')).toBeFalsy();
+  expect(wrapper.find('.van-list__finished-text').exists()).toBeTruthy();
 
+  await wrapper.setProps({ finished: false });
   await later();
   expect(wrapper.emitted('load')).toBeTruthy();
-  expect(wrapper.emitted('input')).toBeTruthy();
-  expect(wrapper.contains('.van-list__finished-text')).toBeFalsy();
+  expect(wrapper.emitted('update:loading')).toBeTruthy();
+  expect(wrapper.find('.van-list__finished-text').exists()).toBeFalsy();
 });
 
-test('finished slot', async () => {
+test('should render finished slot correctly', async () => {
   const wrapper = mount(List, {
-    propsData: {
+    props: {
       finished: true,
     },
-    scopedSlots: {
+    slots: {
       finished: () => 'Custom Finished',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('error slot', async () => {
+test('should render error slot correctly', async () => {
   const wrapper = mount(List, {
-    propsData: {
+    props: {
       error: true,
     },
-    scopedSlots: {
+    slots: {
       error: () => 'Custom Error',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('immediate check false', async () => {
+test('should not emit load event after mounted when immediate-check prop is false', async () => {
   const wrapper = mount(List, {
-    propsData: {
+    props: {
       immediateCheck: false,
     },
   });
 
   await later();
   expect(wrapper.emitted('load')).toBeFalsy();
-  expect(wrapper.emitted('input')).toBeFalsy();
+  expect(wrapper.emitted('update:loading')).toBeFalsy();
 });
 
-test('check the case that scroller is not window', async () => {
+test('should emit load event when the scroll parent is not window', async () => {
   const restoreMock = mockGetBoundingClientRect({
     top: 0,
     bottom: 200,
+    height: 100,
   });
+  const onLoad = jest.fn();
 
-  const wrapper = mount({
-    template: `
+  mount({
+    render: () => (
       <div style="overflow-y: scroll;">
-        <list ref="list"/>
+        <List onLoad={onLoad} />
       </div>
-    `,
-    components: { List },
-  });
-
-  const listRef = wrapper.find({
-    ref: 'list',
+    ),
   });
 
   await later();
-  expect(listRef.emitted('load')).toBeTruthy();
-  expect(listRef.emitted('input')).toBeTruthy();
-
+  expect(onLoad).toHaveBeenCalledTimes(1);
   restoreMock();
 });
 
-test('check the direction props', () => {
+test('should render correctly when direction is up', async () => {
   const wrapper = mount(List, {
     slots: {
-      default: '<div class="list-item">list item</div>',
+      default: () => <div class="list-item">list item</div>,
     },
-    propsData: {
+    props: {
       direction: 'up',
     },
   });
 
   let children = wrapper.findAll('.van-list > div');
-  expect(children.at(0).is('.van-list__placeholder')).toBeTruthy();
-  expect(children.at(1).is('.list-item')).toBeTruthy();
+  expect(children[0].classes()).toContain('van-list__placeholder');
+  expect(children[1].classes()).toContain('list-item');
 
   // change the direction's value
-  wrapper.setProps({
+  await wrapper.setProps({
     direction: 'down',
   });
 
   children = wrapper.findAll('.van-list > div');
-  expect(children.at(0).is('.list-item')).toBeTruthy();
-  expect(children.at(1).is('.van-list__placeholder')).toBeTruthy();
+  expect(children[0].classes()).toContain('list-item');
+  expect(children[1].classes()).toContain('van-list__placeholder');
 });

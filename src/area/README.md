@@ -7,10 +7,11 @@ The Picker component is usually used with [Popup](#/en-US/popup) Component.
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Area } from 'vant';
 
-Vue.use(Area);
+const app = createApp();
+app.use(Area);
 ```
 
 ## Usage
@@ -62,33 +63,34 @@ To have a selected value，simply pass the `code` of target area to `value` prop
 | confirm-button-text | Text of confirm button | _string_ | `Confirm` |
 | cancel-button-text | Text of cancel button | _string_ | `Cancel` |
 | area-list | Area list data | _object_ | - |
-| columns-placeholder `v2.2.5` | Placeholder of columns | _string[]_ | `[]` |
+| columns-placeholder | Placeholder of columns | _string[]_ | `[]` |
 | loading | Whether to show loading prompt | _boolean_ | `false` |
-| item-height `v2.8.6` | Option height, supports `px` ans `rem` unit, default `px` | _number \| string_ | `44` |
+| readonly | Whether to be readonly | _boolean_ | `false` |
+| item-height | Option height, supports `px` `vw` `vh` `rem` unit, default `px` | _number \| string_ | `44` |
 | columns-num | Level of picker | _number \| string_ | `3` |
-| visible-item-count | Count of visible columns | _number \| string_ | `5` |
-| swipe-duration `v2.2.13` | Duration of the momentum animation，unit `ms` | _number \| string_ | `1000` |
-| is-oversea-code `v2.1.4` | The method to validate oversea code | _() => boolean_ | - |
+| visible-item-count | Count of visible columns | _number \| string_ | `6` |
+| swipe-duration | Duration of the momentum animation，unit `ms` | _number \| string_ | `1000` |
+| is-oversea-code | The method to validate oversea code | _() => boolean_ | - |
 
 ### Events
 
 | Event | Description | Arguments |
 | --- | --- | --- |
-| confirm | triggers when clicking the confirm button | an array |
-| cancel | triggers when clicking the cancel button | - |
-| change | Triggered when current option changed | Picker instance, current values，column index |
+| confirm | Emitted when the confirm button is clicked | selected areas |
+| cancel | Emitted when the cancel button is clicked | - |
+| change | Emitted when current option changed | current values，column index |
 
 ### Slots
 
-| Name                    | Description                  |
-| ----------------------- | ---------------------------- |
-| title `v2.5.3`          | Custom title                 |
-| columns-top `v2.5.3`    | Custom content above columns |
-| columns-bottom `v2.5.3` | Custom content below columns |
+| Name           | Description                  |
+| -------------- | ---------------------------- |
+| title          | Custom title                 |
+| columns-top    | Custom content above columns |
+| columns-bottom | Custom content below columns |
 
 ### Methods
 
-Use [ref](https://vuejs.org/v2/api/#ref) to get Area instance and call instance methods
+Use [ref](https://v3.vuejs.org/guide/component-template-refs.html) to get Area instance and call instance methods.
 
 | Name  | Description               | Attribute     | Return value |
 | ----- | ------------------------- | ------------- | ------------ |

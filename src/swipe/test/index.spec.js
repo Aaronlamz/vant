@@ -1,4 +1,25 @@
-import { mount, triggerDrag, later, trigger } from '../../../test';
+import {
+  mount,
+  later,
+  trigger,
+  triggerDrag,
+  mockGetBoundingClientRect,
+} from '../../../test';
+import Swipe from '..';
+import SwipeItem from '../../swipe-item';
+
+let restore;
+
+beforeEach(() => {
+  restore = mockGetBoundingClientRect({
+    width: 100,
+    height: 100,
+  });
+});
+
+afterEach(() => {
+  restore();
+});
 
 function mockPageHidden() {
   let hidden = true;
@@ -12,13 +33,6 @@ function mockPageHidden() {
 }
 
 const Component = {
-  template: `
-    <van-swipe ref="swipe" v-bind="$props" v-on="$listeners">
-      <van-swipe-item :style="style">1</van-swipe-item>
-      <van-swipe-item :style="style">2</van-swipe-item>
-      <van-swipe-item :style="style">3</van-swipe-item>
-    </van-swipe>
-  `,
   props: {
     vertical: Boolean,
     loop: {
@@ -38,163 +52,247 @@ const Component = {
       default: 0,
     },
   },
-  data() {
-    return {
-      style: {
-        width: '100px',
-        height: '100px',
-      },
+  render() {
+    const style = {
+      width: '100px',
+      height: '100px',
     };
+    return (
+      <Swipe ref="swipe" {...this.$props}>
+        <SwipeItem style={style}>1</SwipeItem>
+        <SwipeItem style={style}>2</SwipeItem>
+        <SwipeItem style={style}>3</SwipeItem>
+      </Swipe>
+    );
   },
 };
 
-test('swipeTo method', async () => {
-  const wrapper = mount(Component);
+test('should swipe to specific swipe after calling the swipeTo method', async () => {
+  const onChange = jest.fn();
+  const wrapper = mount(Component, {
+    props: {
+      onChange,
+    },
+  });
+
   const { swipe } = wrapper.vm.$refs;
   swipe.swipeTo(2);
 
-  await later(100);
-  expect(swipe.active).toEqual(2);
+  await later(50);
+  expect(onChange).toHaveBeenCalledWith(2);
 });
 
-test('swipeTo method with immediate option', async () => {
-  const wrapper = mount(Component);
+test('should allow to call swipeTo method with immediate option', async () => {
+  const onChange = jest.fn();
+  const wrapper = mount(Component, {
+    props: {
+      onChange,
+    },
+  });
+
   const { swipe } = wrapper.vm.$refs;
   swipe.swipeTo(2, {
     immediate: true,
   });
 
-  await later(100);
-  expect(swipe.active).toEqual(2);
+  await later(50);
+  expect(onChange).toHaveBeenCalledWith(2);
 });
 
-test('prev and next method', async () => {
-  const wrapper = mount(Component);
-  const { swipe } = wrapper.vm.$refs;
+test('should swipe to next swipe after calling next method', async () => {
+  const onChange = jest.fn();
+  const wrapper = mount(Component, {
+    props: {
+      onChange,
+    },
+  });
 
+  const { swipe } = wrapper.vm.$refs;
   swipe.next();
   await later(50);
-  expect(swipe.active).toEqual(1);
+  expect(onChange).toHaveBeenCalledWith(1);
+});
 
+test('should swipe to prev swipe after calling prev method', async () => {
+  const onChange = jest.fn();
+  const wrapper = mount(Component, {
+    props: {
+      onChange,
+    },
+  });
+
+  const { swipe } = wrapper.vm.$refs;
   swipe.prev();
   await later(50);
-  expect(swipe.active).toEqual(0);
+  expect(onChange).toHaveBeenCalledWith(2);
 });
 
-test('initial swipe', () => {
+test('should render initial swipe correctly', async () => {
   const wrapper = mount(Component);
-  const { swipe } = wrapper.vm.$refs;
+  await later();
+  expect(wrapper.html()).toMatchSnapshot();
 
-  expect(swipe.active).toEqual(0);
-  wrapper.setProps({ initialSwipe: 2 });
-  expect(swipe.active).toEqual(2);
+  await wrapper.setProps({ initialSwipe: 2 });
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('vertical swipe', () => {
+test('should render vertical swipe when using vertical prop', async () => {
   const wrapper = mount(Component, {
-    propsData: {
+    props: {
       vertical: true,
     },
   });
-  const { swipe } = wrapper.vm.$refs;
-  const track = wrapper.find('.van-swipe__track');
 
-  triggerDrag(track, 0, -100);
-  expect(swipe.active).toEqual(1);
+  const track = wrapper.find('.van-swipe__track');
+  await triggerDrag(track, 0, -100);
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('untouchable', () => {
+test('should not allow to drag swipe when touchable is false', async () => {
+  const onChange = jest.fn();
   const wrapper = mount(Component, {
-    propsData: {
+    props: {
+      onChange,
       touchable: false,
     },
   });
-  const { swipe } = wrapper.vm.$refs;
+
   const track = wrapper.find('.van-swipe__track');
 
-  triggerDrag(track, 100, 0);
-  expect(swipe.active).toEqual(0);
+  await triggerDrag(track, 100, 0);
+  expect(wrapper.html()).toMatchSnapshot();
+  expect(onChange).toHaveBeenCalledTimes(0);
 });
 
-test('loop', () => {
-  const wrapper = mount(Component);
-  const { swipe } = wrapper.vm.$refs;
+test('should render swipe looply when using loop prop', async () => {
+  const onChange = jest.fn();
+  const wrapper = mount(Component, {
+    props: {
+      onChange,
+    },
+  });
   const track = wrapper.find('.van-swipe__track');
 
-  triggerDrag(track, -100, 0);
-  expect(swipe.active).toEqual(1);
-  triggerDrag(track, -100, 0);
-  expect(swipe.active).toEqual(2);
-  triggerDrag(track, -100, 0);
-  expect(swipe.active).toEqual(3);
-  triggerDrag(track, -100, 0);
-  expect(swipe.active).toEqual(1);
-  triggerDrag(track, 100, 0);
-  expect(swipe.active).toEqual(0);
-  triggerDrag(track, 100, 0);
-  expect(swipe.active).toEqual(-1);
-  triggerDrag(track, 100, 0);
-  expect(swipe.active).toEqual(1);
+  await triggerDrag(track, -100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(1);
+  await triggerDrag(track, -100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(2);
+  await triggerDrag(track, -100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(0);
+  await triggerDrag(track, -100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(1);
+  await triggerDrag(track, 100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(0);
+  await triggerDrag(track, 100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(2);
+  await triggerDrag(track, 100, 0);
+  expect(onChange).toHaveBeenLastCalledWith(1);
 });
 
-test('should pause auto play when page hidden', async () => {
-  const change = jest.fn();
+test('should pause auto play when page is hidden', async () => {
+  const onChange = jest.fn();
   mount(Component, {
-    propsData: {
+    props: {
       loop: true,
       autoplay: 1,
-    },
-    listeners: {
-      change,
+      onChange,
     },
   });
 
   mockPageHidden();
   await later(50);
-
-  expect(change).toHaveBeenCalledTimes(0);
+  expect(onChange).toHaveBeenCalledTimes(0);
 });
 
-test('lazy-render prop', async () => {
+test('should render swipe item correctly when using lazy-render prop', async () => {
   const wrapper = mount({
-    template: `
-      <van-swipe :initial-swipe="active" lazy-render>
-        <van-swipe-item><span>1</span></van-swipe-item>
-        <van-swipe-item><span>2</span></van-swipe-item>
-        <van-swipe-item><span>3</span></van-swipe-item>
-        <van-swipe-item><span>4</span></van-swipe-item>
-      </van-swipe>
-    `,
     data() {
       return {
         active: 0,
       };
+    },
+    render() {
+      return (
+        <Swipe initialSwipe={this.active} lazyRender>
+          <SwipeItem>
+            <span>1</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>2</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>3</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>4</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>5</span>
+          </SwipeItem>
+        </Swipe>
+      );
     },
   });
 
   await later();
   const items = wrapper.findAll('.van-swipe-item');
 
-  expect(items.at(0).contains('span')).toBeTruthy();
-  expect(items.at(1).contains('span')).toBeTruthy();
-  expect(items.at(2).contains('span')).toBeFalsy();
-  expect(items.at(3).contains('span')).toBeTruthy();
+  const expectRender = (results) => {
+    results.forEach((result, index) => {
+      expect(items[index].find('span').exists()).toEqual(result);
+    });
+  };
 
-  wrapper.setData({ active: 1 });
-  expect(items.at(0).contains('span')).toBeTruthy();
-  expect(items.at(1).contains('span')).toBeTruthy();
-  expect(items.at(2).contains('span')).toBeTruthy();
-  expect(items.at(3).contains('span')).toBeFalsy();
+  expectRender([true, true, false, false, true]);
 
-  wrapper.setData({ active: 2 });
-  expect(items.at(0).contains('span')).toBeFalsy();
-  expect(items.at(1).contains('span')).toBeTruthy();
-  expect(items.at(2).contains('span')).toBeTruthy();
-  expect(items.at(3).contains('span')).toBeTruthy();
+  await wrapper.setData({ active: 1 });
+  expectRender([true, true, true, false, true]);
 
-  wrapper.setData({ active: 3 });
-  expect(items.at(0).contains('span')).toBeTruthy();
-  expect(items.at(1).contains('span')).toBeFalsy();
-  expect(items.at(2).contains('span')).toBeTruthy();
-  expect(items.at(3).contains('span')).toBeTruthy();
+  await wrapper.setData({ active: 2 });
+  expectRender([true, true, true, true, true]);
+});
+
+test('should render swipe item correctly when using lazy-render prop and loop is false', async () => {
+  const wrapper = mount({
+    data() {
+      return {
+        active: 0,
+      };
+    },
+    render() {
+      return (
+        <Swipe initialSwipe={this.active} loop={false} lazyRender>
+          <SwipeItem>
+            <span>1</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>2</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>3</span>
+          </SwipeItem>
+          <SwipeItem>
+            <span>4</span>
+          </SwipeItem>
+        </Swipe>
+      );
+    },
+  });
+
+  await later();
+  const items = wrapper.findAll('.van-swipe-item');
+
+  const expectRender = (results) => {
+    results.forEach((result, index) => {
+      expect(items[index].find('span').exists()).toEqual(result);
+    });
+  };
+
+  expectRender([true, true, false, false]);
+
+  await wrapper.setData({ active: 1 });
+  expectRender([true, true, true, false]);
+
+  await wrapper.setData({ active: 2 });
+  expectRender([true, true, true, true]);
 });

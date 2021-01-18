@@ -53,10 +53,10 @@
     border: @button-border-width solid @button-primary-border-color;
   }
 
-  &--info {
-    color: @button-info-color;
-    background-color: @button-info-background-color;
-    border: @button-border-width solid @button-info-border-color;
+  &--success {
+    color: @button-success-color;
+    background-color: @button-success-background-color;
+    border: @button-border-width solid @button-success-border-color;
   }
 
   &--danger {
@@ -78,8 +78,8 @@
       color: @button-primary-background-color;
     }
 
-    &.van-button--info {
-      color: @button-info-background-color;
+    &.van-button--success {
+      color: @button-success-background-color;
     }
 
     &.van-button--danger {
@@ -151,17 +151,24 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+
+    // fix icon vertical align
+    // see: https://github.com/youzan/vant/issues/7617
+    &::before {
+      content: ' ';
+    }
   }
 
   &__icon {
-    min-width: 1em;
     font-size: 1.2em;
     line-height: inherit;
   }
 
   &__icon + &__text,
-  &__loading + &__text {
-    margin-left: 5px;
+  &__loading + &__text,
+  &__text + &__icon,
+  &__text + &__loading {
+    margin-left: @padding-base;
   }
 
   &--hairline {

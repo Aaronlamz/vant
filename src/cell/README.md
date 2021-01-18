@@ -3,11 +3,12 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Cell, CellGroup } from 'vant';
 
-Vue.use(Cell);
-Vue.use(CellGroup);
+const app = createApp();
+app.use(Cell);
+app.use(CellGroup);
 ```
 
 ## Usage
@@ -84,20 +85,32 @@ Vue.use(CellGroup);
 ### Use Slots
 
 ```html
-<van-cell value="内容" is-link>
+<van-cell value="Content" is-link>
   <!-- Use the title slot to customize the title -->
   <template #title>
-    <span class="custom-title">单元格</span>
-    <van-tag type="danger">标签</van-tag>
+    <span class="custom-title">Title</span>
+    <van-tag type="danger">Tag</van-tag>
   </template>
 </van-cell>
 
-<van-cell title="单元格" icon="shop-o">
+<van-cell title="Title" icon="shop-o">
   <!-- Use the right-icon slot to customize the right icon -->
   <template #right-icon>
-    <van-icon name="search" style="font-size: 16px; line-height: inherit;" />
+    <van-icon name="search" class="search-icon" />
   </template>
 </van-cell>
+
+<style>
+  .custom-title {
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .search-icon {
+    font-size: 16px;
+    line-height: inherit;
+  }
+</style>
 ```
 
 ### Vertical Center
@@ -124,26 +137,26 @@ Vue.use(CellGroup);
 | label | Description below the title | _string_ | - |
 | size | Size，can be set to `large` | _string_ | - |
 | icon | Left Icon | _string_ | - |
-| icon-prefix `v2.5.3` | Icon className prefix | _string_ | `van-icon` |
+| icon-prefix | Icon className prefix | _string_ | `van-icon` |
 | border | Whether to show inner border | _boolean_ | `true` |
 | center | Whether to center content vertically | _boolean_ | `true` |
 | url | Link URL | _string_ | - |
 | to | Target route of the link, same as to of vue-router | _string \| object_ | - |
 | replace | If true, the navigation will not leave a history record | _boolean_ | `false` |
-| clickable | Whether to show click feedback when clicked | _boolean_ | `false` |
+| clickable | Whether to show click feedback when clicked | _boolean_ | `null` |
 | is-link | Whether to show link icon | _boolean_ | `false` |
 | required | Whether to show required mark | _boolean_ | `false` |
 | arrow-direction | Can be set to `left` `up` `down` | _string_ | `right` |
-| title-style | Title style | _any_ | - |
-| title-class | Title className | _any_ | - |
-| value-class | Value className | _any_ | - |
-| label-class | Label className | _any_ | - |
+| title-style | Title style | _string \| Array \| object_ | - |
+| title-class | Title className | _string \| Array \| object_ | - |
+| value-class | Value className | _string \| Array \| object_ | - |
+| label-class | Label className | _string \| Array \| object_ | - |
 
 ### Cell Events
 
-| Event | Description               | Arguments      |
-| ----- | ------------------------- | -------------- |
-| click | Triggered when click cell | _event: Event_ |
+| Event | Description                  | Arguments      |
+| ----- | ---------------------------- | -------------- |
+| click | Emitted when cell is clicked | _event: Event_ |
 
 ### CellGroup Slots
 
@@ -162,3 +175,34 @@ Vue.use(CellGroup);
 | label      | Custom label                      |
 | right-icon | Custom right icon                 |
 | extra      | Custom extra content on the right |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name | Default Value | Description |
+| --- | --- | --- |
+| @cell-font-size | `@font-size-md` | - |
+| @cell-line-height | `24px` | - |
+| @cell-vertical-padding | `10px` | - |
+| @cell-horizontal-padding | `@padding-md` | - |
+| @cell-text-color | `@text-color` | - |
+| @cell-background-color | `@white` | - |
+| @cell-border-color | `@border-color` | - |
+| @cell-active-color | `@active-color` | - |
+| @cell-required-color | `@red` | - |
+| @cell-label-color | `@gray-6` | - |
+| @cell-label-font-size | `@font-size-sm` | - |
+| @cell-label-line-height | `@line-height-sm` | - |
+| @cell-label-margin-top | `@padding-base` | - |
+| @cell-value-color | `@gray-6` | - |
+| @cell-icon-size | `16px` | - |
+| @cell-right-icon-color | `@gray-6` | - |
+| @cell-large-vertical-padding | `@padding-sm` | - |
+| @cell-large-title-font-size | `@font-size-lg` | - |
+| @cell-large-label-font-size | `@font-size-md` | - |
+| @cell-group-background-color | `@white` | - |
+| @cell-group-title-color | `@gray-6` | - |
+| @cell-group-title-padding | `@padding-md @padding-md @padding-xs` | - |
+| @cell-group-title-font-size | `@font-size-md` | - |
+| @cell-group-title-line-height | `16px` | - |

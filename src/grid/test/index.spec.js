@@ -1,60 +1,49 @@
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
+import Grid from '..';
+import GridItem from '../../grid-item';
 
-test('click grid item', () => {
-  const onClick = jest.fn();
+test('should render square grid with gutter correctly', () => {
   const wrapper = mount({
-    template: `
-      <van-grid>
-        <van-grid-item @click="onClick" />
-      </van-grid>
-    `,
-    methods: {
-      onClick,
+    render() {
+      return (
+        <Grid square columnNum="2" gutter="10rem">
+          <GridItem />
+          <GridItem />
+          <GridItem />
+        </Grid>
+      );
     },
   });
 
-  const Item = wrapper.find('.van-grid-item__content');
-  Item.trigger('click');
-
-  expect(onClick).toHaveBeenCalledTimes(1);
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('sqaure and set gutter', () => {
+test('should change icon size when using icon-size prop', () => {
   const wrapper = mount({
-    template: `
-      <van-grid square :column-num="2" gutter="10rem">
-        <van-grid-item />
-        <van-grid-item />
-        <van-grid-item />
-      </van-grid>
-    `,
+    render() {
+      return (
+        <Grid icon-size="10">
+          <GridItem icon="success" />
+        </Grid>
+      );
+    },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-grid-item__icon').element.style.fontSize).toEqual(
+    '10px'
+  );
 });
 
-test('icon-size prop', () => {
+test('should render icon-slot correctly', () => {
   const wrapper = mount({
-    template: `
-      <van-grid icon-size="10">
-        <van-grid-item icon="success" />
-      </van-grid>
-    `,
+    render() {
+      return (
+        <Grid>
+          <GridItem badge="1" v-slots={{ icon: () => 'Custom Icon' }} />
+        </Grid>
+      );
+    },
   });
 
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('render icon-slot', () => {
-  const wrapper = mount({
-    template: `
-      <van-grid icon-size="10">
-        <van-grid-item info="1">
-          <div slot="icon" />
-        </van-grid-item>
-      </van-grid>
-    `,
-  });
-
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });

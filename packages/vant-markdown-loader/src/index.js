@@ -12,16 +12,11 @@ function wrapper(content) {
   content = escape(content);
 
   return `
-<template>
-  <section v-html="content" v-once />
-</template>
+import { h } from 'vue';
 
-<script>
+const content = unescape(\`${content}\`);
+
 export default {
-  created() {
-    this.content = unescape(\`${content}\`);
-  },
-
   mounted() {
     const anchors = [].slice.call(this.$el.querySelectorAll('h2, h3, h4, h5'));
 
@@ -34,14 +29,17 @@ export default {
     scrollToAnchor(event) {
       if (event.target.id) {
         this.$router.push({
-          path: this.$route.path,
-          hash: event.target.id
+          name: this.$route.name,
+          hash: '#' + event.target.id
         })
       }
     }
+  },
+
+  render() {
+    return h('section', { innerHTML: content });
   }
 };
-</script>
 `;
 }
 
@@ -53,7 +51,7 @@ const parser = new MarkdownIt({
   slugify,
 });
 
-module.exports = function(source) {
+module.exports = function (source) {
   let options = loaderUtils.getOptions(this) || {};
   this.cacheable && this.cacheable();
 

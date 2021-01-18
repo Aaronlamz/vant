@@ -1,71 +1,70 @@
+import { createApp } from 'vue';
 import Notify from '..';
+import NotifyComponent from '../Notify';
 import { later } from '../../../test';
+import { trigger } from '../../utils';
 
-test('create a notify', async () => {
-  // should not cause error when call clear before show notify
+test('should not throw error if calling clear method before render notify', () => {
   Notify.clear();
-
-  const notify = Notify('test');
-
-  await later();
-  expect(notify.$el.outerHTML).toMatchSnapshot();
 });
 
-test('type prop', async () => {
-  const notify = Notify({
+test('should render Notify correctly', async () => {
+  Notify('test');
+  await later();
+  expect(document.querySelector('.van-notify')).toMatchSnapshot();
+});
+
+test('should add "van-notify--success" class when type is success', async () => {
+  Notify({
     message: 'test',
-    type: 'primary',
+    type: 'success',
   });
 
   await later();
-  expect(notify.$el.outerHTML).toMatchSnapshot();
+  const notify = document.querySelector('.van-notify');
+  expect(notify.classList.contains('van-notify--success')).toBeTruthy();
 });
 
-test('notify disappear', async () => {
+test('should register component to app', () => {
+  const app = createApp();
+  app.use(Notify);
+  expect(app.component(NotifyComponent.name)).toBeTruthy();
+});
+
+test('should change default duration after calling setDefaultOptions method', () => {
+  Notify.setDefaultOptions({ duration: 1000 });
+  expect(Notify.currentOptions.duration).toEqual(1000);
+  Notify.resetDefaultOptions();
+  expect(Notify.currentOptions.duration).toEqual(3000);
+});
+
+test('should reset to default duration after calling resetDefaultOptions method', () => {
+  Notify.setDefaultOptions({ duration: 1000 });
+  Notify.resetDefaultOptions();
+  expect(Notify.currentOptions.duration).toEqual(3000);
+});
+
+test('should call onClose option when closing', async () => {
   const onClose = jest.fn();
-  const notify = Notify({
+  Notify({
     message: 'test',
-    color: 'red',
-    background: 'blue',
-    duration: 10,
     onClose,
+    duration: 1,
   });
-
-  await later();
-  expect(notify.$el.outerHTML).toMatchSnapshot();
 
   await later(20);
-  expect(notify.$el.outerHTML).toMatchSnapshot();
   expect(onClose).toHaveBeenCalledTimes(1);
-
-  Notify({
-    message: 'text2',
-    duration: 0,
-  });
-
-  await later();
-  expect(notify.$el.outerHTML).toMatchSnapshot();
-
-  Notify.clear();
-  await later();
-  expect(notify.$el.outerHTML).toMatchSnapshot();
 });
 
-test('set default options', () => {
-  Notify.setDefaultOptions({ duration: 1000 });
-  expect(Notify().duration).toEqual(1000);
-  Notify.resetDefaultOptions();
-  expect(Notify().duration).toEqual(3000);
-  Notify.clear();
-});
-
-test('onClick prop', async () => {
+test('should call onClick option when clicked', async () => {
   const onClick = jest.fn();
-  const notify = Notify({
+  Notify({
     message: 'test',
     onClick,
   });
 
-  notify.$el.click();
-  expect(onClick).toHaveBeenCalled();
+  await later();
+  const notify = document.querySelector('.van-notify');
+  trigger(notify, 'click');
+  expect(onClick).toHaveBeenCalledTimes(1);
 });

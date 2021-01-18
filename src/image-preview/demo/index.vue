@@ -1,42 +1,68 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('basicUsage')">
-      <van-button type="primary" @click="showImagePreview">
-        {{ t('button1') }}
-      </van-button>
-    </demo-block>
+  <demo-block card :title="t('basicUsage')">
+    <van-cell is-link @click="showImagePreview()">
+      {{ t('showImages') }}
+    </van-cell>
+  </demo-block>
 
-    <demo-block :title="t('button2')">
-      <van-button type="primary" @click="showImagePreview(1)">
-        {{ t('button2') }}
-      </van-button>
-    </demo-block>
+  <demo-block card :title="t('customConfig')">
+    <van-cell is-link @click="showImagePreview({ startPosition: 1 })">
+      {{ t('startPosition') }}
+    </van-cell>
+    <van-cell is-link @click="showImagePreview({ closeable: true })">
+      {{ t('showClose') }}
+    </van-cell>
+    <van-cell is-link @click="showImagePreview({ onClose })">
+      {{ t('closeEvent') }}
+    </van-cell>
+  </demo-block>
 
-    <demo-block :title="t('button4')">
-      <van-button type="primary" @click="showImagePreview(0, 0, true)">
-        {{ t('button4') }}
-      </van-button>
-    </demo-block>
+  <demo-block card :title="t('beforeClose')">
+    <van-cell is-link @click="showImagePreview({ beforeClose })">
+      {{ t('beforeClose') }}
+    </van-cell>
+  </demo-block>
 
-    <demo-block :title="t('button3')">
-      <van-button type="primary" @click="showImagePreview(0, 3000)">
-        {{ t('button3') }}
-      </van-button>
-    </demo-block>
-
-    <demo-block :title="t('componentCall')">
-      <van-button type="primary" @click="componentCall">
-        {{ t('componentCall') }}
-      </van-button>
-      <van-image-preview v-model="show" :images="images" @change="onChange">
-        <template #index>{{ t('index', index) }}</template>
-      </van-image-preview>
-    </demo-block>
-  </demo-section>
+  <demo-block card :title="t('componentCall')">
+    <van-cell is-link @click="showComponentCall">
+      {{ t('componentCall') }}
+    </van-cell>
+    <van-image-preview v-model:show="show" :images="images" @change="onChange">
+      <template #index>{{ t('index', index) }}</template>
+    </van-image-preview>
+  </demo-block>
 </template>
 
 <script>
+import { reactive, toRefs } from 'vue';
+import { useTranslate } from '@demo/use-translate';
 import ImagePreview from '..';
+import Toast from '../../toast';
+
+const i18n = {
+  'zh-CN': {
+    closed: '关闭',
+    showClose: '展示关闭按钮',
+    showImages: '预览图片',
+    beforeClose: '异步关闭',
+    closeEvent: '监听关闭事件',
+    customConfig: '传入配置项',
+    startPosition: '指定初始位置',
+    componentCall: '组件调用',
+    index: (index) => `第${index + 1}页`,
+  },
+  'en-US': {
+    closed: 'closed',
+    showClose: 'Show Close Icon',
+    showImages: 'Show Images',
+    beforeClose: 'Before Close',
+    closeEvent: 'Close Event',
+    customConfig: 'Custom Config',
+    startPosition: 'Set Start Position',
+    componentCall: 'Component Call',
+    index: (index) => `Page: ${index}`,
+  },
+};
 
 const images = [
   'https://img.yzcdn.cn/vant/apple-1.jpg',
@@ -46,70 +72,55 @@ const images = [
 ];
 
 export default {
-  i18n: {
-    'zh-CN': {
-      button1: '预览图片',
-      button2: '指定初始位置',
-      button3: '异步关闭',
-      button4: '展示关闭按钮',
-      componentCall: '组件调用',
-      index: (index) => `第${index + 1}页`,
-    },
-    'en-US': {
-      button1: 'Show Images',
-      button2: 'Custom Start Position',
-      button3: 'Async Close',
-      button4: 'Show Close Icon',
-      componentCall: 'Component Call',
-      index: (index) => `Page: ${index}`,
-    },
-  },
-
-  data() {
-    return {
+  setup() {
+    const t = useTranslate(i18n);
+    const state = reactive({
       show: false,
-      images,
       index: 0,
+    });
+
+    const onClose = () => {
+      Toast(t('closed'));
     };
-  },
 
-  methods: {
-    componentCall() {
-      this.show = true;
-    },
-
-    onChange(index) {
-      this.index = index;
-    },
-
-    showImagePreview(position, timer, closeable) {
-      const instance = ImagePreview({
-        images,
-        swipeDuration: 300,
-        asyncClose: !!timer,
-        closeable,
-        closeOnPopstate: true,
-        startPosition: typeof position === 'number' ? position : 0,
+    const beforeClose = () =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(true);
+        }, 1000);
       });
 
-      if (timer) {
+    const showComponentCall = () => {
+      state.show = true;
+    };
+
+    const onChange = (index) => {
+      state.index = index;
+    };
+
+    const showImagePreview = (options = {}) => {
+      const instance = ImagePreview({
+        images,
+        ...options,
+      });
+
+      if (options.beforeClose) {
         setTimeout(() => {
           instance.close();
-        }, timer);
+        }, 2000);
       }
-    },
+    };
+
+    return {
+      ...toRefs(state),
+      t,
+      images,
+      onClose,
+      onChange,
+      beforeClose,
+      showImagePreview,
+      showComponentCall,
+    };
   },
 };
 </script>
-
-<style lang="less">
-@import '../../style/var';
-
-.demo-image-preview {
-  background-color: @white;
-
-  .van-button {
-    margin-left: @padding-md;
-  }
-}
-</style>

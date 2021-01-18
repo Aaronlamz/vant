@@ -1,13 +1,11 @@
 import Search from '..';
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 
-test('input event', () => {
-  const onInput = jest.fn();
+test('should emit update:modelValue event when input value changed', () => {
+  const onUpdateModelValue = jest.fn();
   const wrapper = mount(Search, {
-    context: {
-      on: {
-        input: onInput,
-      },
+    props: {
+      'onUpdate:modelValue': onUpdateModelValue,
     },
   });
 
@@ -15,111 +13,127 @@ test('input event', () => {
   input.element.value = '1';
   input.trigger('input');
 
-  expect(onInput).toHaveBeenCalledWith('1');
+  expect(onUpdateModelValue).toHaveBeenCalledTimes(1);
+  expect(onUpdateModelValue).toHaveBeenCalledWith('1');
 });
 
-test('cancel event', () => {
-  const onInput = jest.fn();
-  const onCancel = jest.fn();
-
+test('should emit cancel event when cancel button click is clicked', () => {
   const wrapper = mount(Search, {
-    propsData: {
+    props: {
       value: 'test',
       showAction: true,
-    },
-    context: {
-      on: {
-        input: onInput,
-        cancel: onCancel,
-      },
     },
   });
 
   const cancel = wrapper.find('.van-search__action');
   cancel.trigger('click');
 
-  expect(onInput).toHaveBeenCalledWith('');
-  expect(onCancel).toHaveBeenCalled();
+  expect(wrapper.emitted('cancel').length).toEqual(1);
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual('');
 });
 
-test('search event', () => {
-  const onSearch = jest.fn();
-  const onKeypress = jest.fn();
-
+test('should not emit cancel event when using action slot', () => {
   const wrapper = mount(Search, {
-    context: {
-      on: {
-        search: onSearch,
-        keypress: onKeypress,
-      },
+    props: {
+      value: 'test',
+      showAction: true,
+    },
+    slots: {
+      action: () => 'Custom Action',
     },
   });
+
+  const cancel = wrapper.find('.van-search__action');
+  cancel.trigger('click');
+
+  expect(wrapper.emitted('cancel')).toBeFalsy();
+});
+
+test('should emit search event when enter key is pressed', () => {
+  const wrapper = mount(Search);
 
   const input = wrapper.find('input');
   input.trigger('keypress.enter');
   input.trigger('keypress.a');
 
-  expect(onSearch).toHaveBeenCalled();
-  expect(onKeypress).toHaveBeenCalled();
+  expect(wrapper.emitted('search').length).toEqual(1);
 });
 
-test('label slot', () => {
+test('should render label slot correctly', () => {
   const wrapper = mount(Search, {
-    scopedSlots: {
+    slots: {
       label: () => 'Custom Label',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-search__label').html()).toMatchSnapshot();
 });
 
-test('left slot', () => {
+test('should render left slot correctly', () => {
   const wrapper = mount(Search, {
-    scopedSlots: {
+    slots: {
       left: () => 'Custom Left Content',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('left-icon prop', () => {
+test('should render left icon when using left-icon prop', () => {
   const wrapper = mount(Search, {
-    propsData: {
+    props: {
       leftIcon: 'setting-o',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-field__left-icon').html()).toMatchSnapshot();
 });
 
-test('right-icon prop', () => {
+test('should render right icon when using right-icon prop', () => {
   const wrapper = mount(Search, {
-    propsData: {
+    props: {
       rightIcon: 'setting-o',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-field__right-icon').html()).toMatchSnapshot();
 });
 
-test('right-icon slot', () => {
+test('should render right-icon slot correctly', () => {
   const wrapper = mount(Search, {
-    scopedSlots: {
+    slots: {
       'right-icon': () => 'Custom Right Icon',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-field__right-icon').html()).toMatchSnapshot();
 });
 
-test('action-text prop', () => {
+test('should render action text when using action-text prop', () => {
   const wrapper = mount(Search, {
-    propsData: {
+    props: {
       actionText: 'Custom Text',
       showAction: true,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-search__action').html()).toMatchSnapshot();
+});
+
+test('should call input.focus when vm.focus is called', () => {
+  const wrapper = mount(Search);
+  const onFocus = jest.fn();
+  wrapper.find('input').element.focus = onFocus;
+
+  wrapper.vm.focus();
+  expect(onFocus).toHaveBeenCalledTimes(1);
+});
+
+test('should call input.blur when vm.blur is called', () => {
+  const wrapper = mount(Search);
+  const onBlur = jest.fn();
+  wrapper.find('input').element.blur = onBlur;
+
+  wrapper.vm.blur();
+  expect(onBlur).toHaveBeenCalledTimes(1);
 });

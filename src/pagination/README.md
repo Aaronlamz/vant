@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Pagination } from 'vant';
 
-Vue.use(Pagination);
+const app = createApp();
+app.use(Pagination);
 ```
 
 ## Usage
@@ -18,11 +19,12 @@ Vue.use(Pagination);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      currentPage: 1,
-    };
+  setup() {
+    const currentPage = ref(1);
+    return { currentPage };
   },
 };
 ```
@@ -44,6 +46,20 @@ export default {
 />
 ```
 
+### Custom Button
+
+```html
+<van-pagination v-model="currentPage" :total-items="50" :show-page-size="5">
+  <template #prev-text>
+    <van-icon name="arrow-left" />
+  </template>
+  <template #next-text>
+    <van-icon name="arrow" />
+  </template>
+  <template #page="{ text }">{{ text }}</template>
+</van-pagination>
+```
+
 ## API
 
 ### Props
@@ -62,6 +78,30 @@ export default {
 
 ### Events
 
-| Event  | Description              | Arguments |
-| ------ | ------------------------ | --------- |
-| change | Triggered on page change | -         |
+| Event  | Description                       | Arguments |
+| ------ | --------------------------------- | --------- |
+| change | Emitted when current page changed | -         |
+
+### Slots
+
+| Name | Description | SlotProps |
+| --- | --- | --- |
+| page | Custom pagination item | _{ number: number, text: string, active: boolean }_ |
+| prev-text | Custom prev text | `-` |
+| next-text | Custom next text | `-` |
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name | Default Value | Description |
+| --- | --- | --- |
+| @pagination-height | `40px` | - |
+| @pagination-font-size | `@font-size-md` | - |
+| @pagination-item-width | `36px` | - |
+| @pagination-item-default-color | `@blue` | - |
+| @pagination-item-disabled-color | `@gray-7` | - |
+| @pagination-item-disabled-background-color | `@background-color` | - |
+| @pagination-background-color | `@white` | - |
+| @pagination-desc-color | `@gray-7` | - |
+| @pagination-disabled-opacity | `@disabled-opacity` | - |

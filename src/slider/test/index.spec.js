@@ -15,152 +15,162 @@ function mockRect(vertical) {
   });
 }
 
-test('drag button', () => {
-  const restoreMock = mockRect();
-
+test('should emit "update:modelValue" event after dragging button', () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
-      disabled: true,
+    props: {
+      modelValue: 50,
     },
-  });
-
-  wrapper.vm.$on('input', (value) => {
-    wrapper.setProps({ value });
   });
 
   const button = wrapper.find('.van-slider__button');
   triggerDrag(button, 50, 0);
-  expect(wrapper).toMatchSnapshot();
-  expect(wrapper.emitted('drag-start')).toBeFalsy();
-  expect(wrapper.emitted('drag-end')).toBeFalsy();
-
-  wrapper.setData({ disabled: false });
-  trigger(button, 'touchstart', 0, 0);
-  trigger(button, 'touchend', 0, 0);
-  triggerDrag(button, 50, 0);
-  expect(wrapper).toMatchSnapshot();
-  expect(wrapper.emitted('drag-start')).toBeTruthy();
-  expect(wrapper.emitted('drag-end')).toBeTruthy();
-
-  restoreMock();
+  expect(wrapper.emitted('update:modelValue').pop()).toEqual([100]);
 });
 
-test('click bar', () => {
-  const restoreMock = mockRect();
-
+test('should emit "update:modelValue" event after clicking slider', () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
+    props: {
+      modelValue: 50,
+    },
+  });
+
+  trigger(wrapper, 'click', 100, 0);
+  expect(wrapper.emitted('update:modelValue').pop()).toEqual([100]);
+});
+
+test('should emit drag-start event when start dragging', () => {
+  const wrapper = mount(Slider, {
+    props: {
+      modelValue: 50,
+    },
+  });
+
+  const button = wrapper.find('.van-slider__button');
+  trigger(button, 'touchstart');
+  trigger(button, 'touchmove');
+  expect(wrapper.emitted('drag-start')).toBeTruthy();
+});
+
+test('should emit drag-end event when end dragging', () => {
+  const wrapper = mount(Slider, {
+    props: {
+      modelValue: 50,
+    },
+  });
+
+  const button = wrapper.find('.van-slider__button');
+  trigger(button, 'touchstart');
+  trigger(button, 'touchmove');
+  expect(wrapper.emitted('drag-end')).toBeFalsy();
+  trigger(button, 'touchend');
+  expect(wrapper.emitted('drag-end')).toBeTruthy();
+});
+
+test('should not allow to drag slider when disabled', async () => {
+  const wrapper = mount(Slider, {
+    props: {
+      modelValue: 50,
       disabled: true,
     },
   });
 
-  wrapper.vm.$on('input', (value) => {
-    wrapper.setProps({ value });
-  });
-
-  trigger(wrapper, 'click', 100, 0);
-  expect(wrapper).toMatchSnapshot();
-
-  wrapper.setData({ disabled: false });
-  trigger(wrapper, 'click', 100, 0);
-  expect(wrapper).toMatchSnapshot();
-
-  restoreMock();
+  const button = wrapper.find('.van-slider__button');
+  triggerDrag(button, 50, 0);
+  expect(wrapper.emitted('update:modelValue')).toBeFalsy();
 });
 
-test('drag button vertical', () => {
-  const restoreMock = mockRect(true);
-
+test('should not allow to click slider when disabled', async () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
-      vertical: true,
+    props: {
+      modelValue: 50,
+      disabled: true,
     },
   });
 
-  wrapper.vm.$on('input', (value) => {
-    wrapper.setProps({ value });
+  trigger(wrapper, 'click', 100, 0);
+  expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+});
+
+test('should allow to drag vertical slider', () => {
+  const restoreMock = mockRect(true);
+
+  const wrapper = mount(Slider, {
+    props: {
+      vertical: true,
+      modelValue: 50,
+    },
   });
 
   const button = wrapper.find('.van-slider__button');
   triggerDrag(button, 0, 50);
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.emitted('update:modelValue').pop()).toEqual([100]);
 
   restoreMock();
 });
 
-test('click vertical', () => {
-  const restoreMock = mockRect(true);
-
+test('should change slider bar height when using bar-height prop', () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
-      vertical: true,
-    },
-  });
-
-  wrapper.vm.$on('input', (value) => {
-    wrapper.setProps({ value });
-  });
-
-  trigger(wrapper, 'click', 0, 100);
-  expect(wrapper).toMatchSnapshot();
-
-  restoreMock();
-});
-
-test('bar-height prop', () => {
-  const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
+    props: {
       barHeight: 10,
+      modelValue: 50,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.element.style.height).toEqual('10px');
 });
 
-test('button-size prop', () => {
+test('shoud change button size when using button-size prop', () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
+    props: {
+      modelValue: 50,
       buttonSize: 10,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  const button = wrapper.find('.van-slider__button').element;
+  expect(button.style.width).toEqual('10px');
+  expect(button.style.height).toEqual('10px');
 });
 
-test('should not emit change event when value not changed', () => {
+test('should emit "update:modelValue" event after clicking vertical slider', () => {
   const wrapper = mount(Slider, {
-    propsData: {
-      value: 50,
-    },
-    listeners: {
-      input(value) {
-        wrapper.setProps({ value });
-      },
+    props: {
+      vertical: true,
+      modelValue: 50,
     },
   });
 
-  trigger(wrapper, 'click', 100, 0);
-  trigger(wrapper, 'click', 100, 0);
-
-  expect(wrapper.emitted('change').length).toEqual(1);
+  trigger(wrapper, 'click', 0, 100);
+  expect(wrapper.emitted('update:modelValue').pop()).toEqual([100]);
 });
 
 test('should format initial value', (done) => {
   mount(Slider, {
-    propsData: {
-      value: null,
-    },
-    listeners: {
-      input(value) {
+    props: {
+      modelValue: null,
+      'onUpdate:modelValue': (value) => {
         expect(value).toEqual(0);
         done();
       },
     },
   });
+});
+
+test('should not emit change event when value not changed', async () => {
+  const wrapper = mount(Slider, {
+    props: {
+      modelValue: 50,
+    },
+  });
+
+  const button = wrapper.find('.van-slider__button');
+  trigger(button, 'touchstart');
+  trigger(wrapper, 'click', 100, 0);
+  expect(wrapper.emitted('change').length).toEqual(1);
+
+  await wrapper.setProps({ modelValue: 100 });
+  trigger(button, 'touchstart');
+  trigger(wrapper, 'click', 100, 0);
+
+  expect(wrapper.emitted('change').length).toEqual(1);
 });

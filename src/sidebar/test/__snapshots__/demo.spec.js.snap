@@ -1,75 +1,116 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders demo correctly 1`] = `
-<div>
-  <div class="van-grid">
-    <div class="van-grid-item" style="flex-basis: 50%;">
-      <div class="van-grid-item__content van-grid-item__content--center">
-        <h3 class="demo-sidebar-title">基础用法</h3>
-        <div class="van-sidebar"><a class="van-sidebar-item van-sidebar-item--select">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a></div>
+exports[`should render demo and match snapshot 1`] = `
+<div class="van-grid">
+  <div class="van-grid-item"
+       style="flex-basis: 50%;"
+  >
+    <div class="van-grid-item__content van-grid-item__content--center">
+      <h3 class="demo-sidebar-title">
+        Basic Usage
+      </h3>
+      <div class="van-sidebar">
+        <a class="van-sidebar-item van-sidebar-item--select">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
       </div>
     </div>
-    <div class="van-grid-item" style="flex-basis: 50%;">
-      <div class="van-grid-item__content van-grid-item__content--center">
-        <h3 class="demo-sidebar-title">徽标提示</h3>
-        <div class="van-sidebar"><a class="van-sidebar-item van-sidebar-item--select">
-            <div class="van-sidebar-item__text">标签名<div class="van-info van-info--dot van-sidebar-item__info"></div>
+  </div>
+  <div class="van-grid-item"
+       style="flex-basis: 50%;"
+  >
+    <div class="van-grid-item__content van-grid-item__content--center">
+      <h3 class="demo-sidebar-title">
+        Show Badge
+      </h3>
+      <div class="van-sidebar">
+        <a class="van-sidebar-item van-sidebar-item--select">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+            <div class="van-badge van-badge--dot van-badge--fixed">
             </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名<div class="van-info van-sidebar-item__info">5</div>
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+            <div class="van-badge van-badge--fixed">
+              5
             </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名<div class="van-info van-sidebar-item__info">99+</div>
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+            <div class="van-badge van-badge--fixed">
+              20
             </div>
-          </a></div>
+          </div>
+        </a>
       </div>
     </div>
-    <div class="van-grid-item" style="flex-basis: 50%;">
-      <div class="van-grid-item__content van-grid-item__content--center">
-        <h3 class="demo-sidebar-title">禁用选项</h3>
-        <div class="van-sidebar"><a class="van-sidebar-item van-sidebar-item--select">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item van-sidebar-item--disabled">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名
-              <!---->
-            </div>
-          </a></div>
+  </div>
+  <div class="van-grid-item"
+       style="flex-basis: 50%;"
+  >
+    <div class="van-grid-item__content van-grid-item__content--center">
+      <h3 class="demo-sidebar-title">
+        Disabled
+      </h3>
+      <div class="van-sidebar">
+        <a class="van-sidebar-item van-sidebar-item--select">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
+        <a class="van-sidebar-item van-sidebar-item--disabled">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title
+          </div>
+        </a>
       </div>
     </div>
-    <div class="van-grid-item" style="flex-basis: 50%;">
-      <div class="van-grid-item__content van-grid-item__content--center">
-        <h3 class="demo-sidebar-title">监听切换事件</h3>
-        <div class="van-sidebar"><a class="van-sidebar-item van-sidebar-item--select">
-            <div class="van-sidebar-item__text">标签名1
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名2
-              <!---->
-            </div>
-          </a> <a class="van-sidebar-item">
-            <div class="van-sidebar-item__text">标签名3
-              <!---->
-            </div>
-          </a></div>
+  </div>
+  <div class="van-grid-item"
+       style="flex-basis: 50%;"
+  >
+    <div class="van-grid-item__content van-grid-item__content--center">
+      <h3 class="demo-sidebar-title">
+        Change Event
+      </h3>
+      <div class="van-sidebar">
+        <a class="van-sidebar-item van-sidebar-item--select">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title 1
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title 2
+          </div>
+        </a>
+        <a class="van-sidebar-item">
+          <div class="van-badge__wrapper van-sidebar-item__text">
+            Title 3
+          </div>
+        </a>
       </div>
     </div>
   </div>

@@ -1,56 +1,70 @@
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 import Skeleton from '..';
 
-test('row-width array', () => {
+test('should render with row width array correctly', () => {
   const wrapper = mount(Skeleton, {
-    propsData: {
+    props: {
       row: 4,
       rowWidth: ['100%', 30, '5rem'],
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('render chidren', () => {
+test('should render default slot when loading is false', () => {
   const wrapper = mount({
-    template: `
-      <skeleton :loading="false">
+    render: () => (
+      <Skeleton loading={false}>
         <div>Content</div>
-      </skeleton>
-    `,
-    components: { Skeleton },
+      </Skeleton>
+    ),
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('avatar shape', () => {
+test('should change avatar size when using avatar-size prop', () => {
   const wrapper = mount(Skeleton, {
-    propsData: {
+    props: {
       avatar: true,
-      avatarSize: 20,
+      avatarSize: '20rem',
+    },
+  });
+
+  const avatar = wrapper.find('.van-skeleton__avatar').element;
+  expect(avatar.style.width).toMatchSnapshot('20rem');
+  expect(avatar.style.height).toMatchSnapshot('20ren');
+});
+
+test('should change avatar shape when using avatar-shape prop', () => {
+  const wrapper = mount(Skeleton, {
+    props: {
+      avatar: true,
       avatarShape: 'square',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-skeleton__avatar').html()).toMatchSnapshot();
 });
 
-test('round prop', () => {
+test('should be round when using round prop', () => {
   const wrapper = mount(Skeleton, {
-    propsData: {
+    props: {
       title: true,
       round: true,
       avatar: true,
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-skeleton--round').exists()).toBeTruthy();
 });
 
-test('disable animate', () => {
+test('should allow to disable animation', async () => {
   const wrapper = mount(Skeleton, {
-    propsData: {
+    props: {
       row: 1,
-      aniamte: false,
     },
   });
-  expect(wrapper).toMatchSnapshot();
+
+  expect(wrapper.find('.van-skeleton--animate').exists()).toBeTruthy();
+
+  await wrapper.setProps({ animate: false });
+  expect(wrapper.find('.van-skeleton--animate').exists()).toBeFalsy();
 });

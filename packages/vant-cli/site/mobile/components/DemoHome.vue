@@ -10,9 +10,12 @@
     <h2 v-if="config.description" class="demo-home__desc">
       {{ config.description }}
     </h2>
-    <template v-for="(group, index) in config.nav">
-      <demo-home-nav :group="group" :lang="lang" :key="index" />
-    </template>
+    <demo-home-nav
+      v-for="(group, index) in config.nav"
+      :key="index"
+      :lang="lang"
+      :group="group"
+    />
   </div>
 </template>
 
@@ -82,7 +85,6 @@ export default {
 
     span {
       margin-left: 16px;
-      font-weight: 500;
     }
 
     &--small {

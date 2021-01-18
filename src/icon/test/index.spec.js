@@ -1,65 +1,77 @@
 import Icon from '..';
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 
-test('render icon with builtin icon name', () => {
+test('should render icon with builtin icon name correctly', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
       name: 'success',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('render icon with url name', () => {
+test('should render icon with url name correctly', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
       name: 'https://img.yzcdn.com/icon.jpg',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('render icon with local image', () => {
+test('should render icon with local image correctly', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
       name: '/assets/icon.jpg',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('render icon default slot', () => {
-  const wrapper = mount({
-    render(h) {
-      return h(Icon, { props: { name: 'success' } }, ['Default slot']);
+test('should render default slot correctly', () => {
+  const wrapper = mount(Icon, {
+    props: {
+      name: 'success',
+    },
+    slots: {
+      default: () => 'Default Slot',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('tag prop', () => {
+test('should change root tag after using tag prop', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
       tag: 'div',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.element.tagName).toEqual('DIV');
 });
 
-test('dot prop', () => {
+test('should render dot correctly', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
       dot: true,
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-badge').html()).toMatchSnapshot();
 });
 
-test('size without unit', () => {
+test('should render badge correctly', () => {
   const wrapper = mount(Icon, {
-    propsData: {
+    props: {
+      badge: '1',
+    },
+  });
+  expect(wrapper.find('.van-badge').html()).toMatchSnapshot();
+});
+
+test('should change icon size when using size prop', () => {
+  const wrapper = mount(Icon, {
+    props: {
       size: 20,
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.element.style.fontSize).toEqual('20px');
 });

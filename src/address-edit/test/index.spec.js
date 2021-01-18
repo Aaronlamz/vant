@@ -1,198 +1,147 @@
 import AddressEdit from '..';
 import areaList from '../../area/demo/area-simple';
-import { mount, later } from '../../../test';
+import { mount, later, trigger } from '../../../test';
 
-const addressInfo = {
+const defaultAddressInfo = {
   name: '测试',
   tel: '13000000000',
   province: '北京市',
   city: '北京市',
   county: '朝阳区',
-  addressDetail: '详细地址',
+  addressDetail: 'address detail',
   areaCode: '110101',
   postalCode: '10000',
   isDefault: true,
 };
 
-const createComponent = () => {
+const createComponent = (addressInfo = {}) => {
   const wrapper = mount(AddressEdit, {
-    propsData: {
+    props: {
       areaList,
-      addressInfo,
+      addressInfo: {
+        ...defaultAddressInfo,
+        ...addressInfo,
+      },
       showPostal: true,
       showSetDefault: true,
     },
   });
 
   const button = wrapper.find('.van-button');
-  const field = wrapper.findAll('.van-field__control');
-  const { errorInfo, data } = wrapper.vm;
+  const fields = wrapper.findAll('.van-field');
   return {
     vm: wrapper.vm,
-    data,
-    field,
+    fields,
     button,
     wrapper,
-    errorInfo,
   };
 };
 
-test('create a AddressEdit', () => {
-  expect(mount(AddressEdit)).toMatchSnapshot();
+test('should render AddressEdit correctly', () => {
+  expect(mount(AddressEdit).html()).toMatchSnapshot();
 });
 
-test('create a AddressEdit with props', () => {
+test('should render AddressEdit with props correctly', () => {
   const wrapper = mount(AddressEdit, {
-    propsData: {
+    props: {
       areaList,
-      addressInfo,
+      addressInfo: defaultAddressInfo,
       showPostal: true,
       showSetDefault: true,
       showSearchResult: true,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });
 
-test('valid area placeholder confirm', async () => {
+// test('set-default', () => {
+//   const { wrapper } = createComponent();
+//   wrapper.find('.van-switch').trigger('click');
+
+//   expect(wrapper.html()).toMatchSnapshot();
+// });
+
+test('should allow to custom validator with validator prop', async () => {
   const wrapper = mount(AddressEdit, {
-    propsData: {
+    props: {
       areaList,
-      areaColumnsPlaceholder: ['请选择', '请选择', '请选择'],
+      validator: (key, value) => `foo ${key}${value}`,
     },
   });
 
-  const { data } = wrapper.vm;
-
-  wrapper.find('.van-picker__confirm').trigger('click');
-
-  expect(data.areaCode).toBe('');
-  await later(50);
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('show area component', async () => {
-  const { wrapper } = createComponent();
-
-  const field = wrapper.findAll('.van-field').at(2);
-  field.trigger('click');
-
-  await later(50);
-  expect(wrapper).toMatchSnapshot();
-
-  wrapper.find('.van-picker__cancel').trigger('click');
-
-  await later(50);
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('set-default', () => {
-  const { wrapper } = createComponent();
-  wrapper.find('.van-switch').trigger('click');
-
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('validator props', async () => {
-  const wrapper = mount(AddressEdit, {
-    propsData: {
-      areaList,
-      validator(key, value) {
-        return `${key}${value}`;
-      },
-    },
-  });
-
-  const { errorInfo, data } = wrapper.vm;
-  data.name = '';
   const button = wrapper.find('.van-button');
-  button.trigger('click');
-
-  expect(errorInfo.name).toBeTruthy();
+  await button.trigger('click');
+  expect(wrapper.find('.van-field__error-message').html()).toMatchSnapshot();
 });
 
-test('valid name', () => {
-  const { data, field, button, errorInfo } = createComponent();
+test('should valid name and render error message correctly', async () => {
+  const { fields, button } = createComponent({
+    name: '',
+  });
 
-  // name empty
-  data.name = '';
-  button.trigger('click');
-  expect(errorInfo.name).toBeTruthy();
-  field.at(0).trigger('focus');
-  expect(errorInfo.name).toBeFalsy();
+  await button.trigger('click');
+  expect(fields[0].html()).toMatchSnapshot();
+  await fields[0].find('input').trigger('focus');
+  expect(fields[0].html()).toMatchSnapshot();
 });
 
-test('valid tel', () => {
-  const { data, field, button, errorInfo } = createComponent();
-  data.tel = '';
-  button.trigger('click');
-  expect(errorInfo.tel).toBeTruthy();
-  field.at(1).trigger('focus');
-  expect(errorInfo.tel).toBeFalsy();
+test('should valid tel and render error message correctly', async () => {
+  const { fields, button } = createComponent({
+    tel: '',
+  });
+
+  await button.trigger('click');
+  expect(fields[1].html()).toMatchSnapshot();
+  await fields[1].find('input').trigger('focus');
+  expect(fields[1].html()).toMatchSnapshot();
 });
 
-test('valid areaCode', () => {
-  const { data, button, errorInfo } = createComponent();
-  // areaCode empty
-  data.areaCode = '';
-  button.trigger('click');
-  expect(errorInfo.areaCode).toBeTruthy();
+test('should valid area code and render error message correctly', async () => {
+  const { fields, button } = createComponent({
+    areaCode: '',
+  });
 
-  // areaCode invalid
-  data.areaCode = '-1';
-  button.trigger('click');
-  expect(errorInfo.areaCode).toBeTruthy();
+  await button.trigger('click');
+  expect(fields[2].html()).toMatchSnapshot();
+  await fields[2].find('input').trigger('focus');
+  expect(fields[2].html()).toMatchSnapshot();
 });
 
-test('valid addressDetail', () => {
-  const { data, field, button, errorInfo } = createComponent();
-  data.addressDetail = '';
-  button.trigger('click');
-  expect(errorInfo.addressDetail).toBeTruthy();
-  field.at(3).trigger('focus');
-  expect(errorInfo.addressDetail).toBeFalsy();
+test('should valid address detail and render error message correctly', async () => {
+  const { fields, button } = createComponent({
+    addressDetail: '',
+  });
+
+  await button.trigger('click');
+  expect(fields[3].html()).toMatchSnapshot();
+  await fields[3].find('textarea').trigger('focus');
+  expect(fields[3].html()).toMatchSnapshot();
 });
 
-test('valid postal code', () => {
-  const { vm, data, field, button, errorInfo } = createComponent();
+test('should valid postal code and render error message correctly', async () => {
+  const { fields, button } = createComponent({
+    postalCode: '123',
+  });
 
-  // postalCode invalid
-  data.postalCode = '123';
-  button.trigger('click');
-  expect(errorInfo.postalCode).toBeTruthy();
-  field.at(4).trigger('focus');
-  expect(errorInfo.postalCode).toBeFalsy();
-
-  // valid result
-  data.postalCode = '123456';
-  button.trigger('click');
-
-  // not show postalCode
-  data.postalCode = '156';
-  vm.showPostal = false;
-  button.trigger('click');
-  expect(errorInfo.postalCode).toBeFalsy();
+  await button.trigger('click');
+  expect(fields[4].html()).toMatchSnapshot();
+  await fields[4].find('input').trigger('focus');
+  expect(fields[4].html()).toMatchSnapshot();
 });
 
-test('on change detail', () => {
+test('should emit change-detail event after changing address detail', () => {
   const wrapper = mount(AddressEdit);
-  const field = wrapper.findAll('.van-field__control').at(3);
+  const field = wrapper.findAll('.van-field__control')[3];
 
   field.element.value = '123';
   field.trigger('input');
   expect(wrapper.emitted('change-detail')[0][0]).toEqual('123');
 });
 
-test('watch address info', () => {
-  const wrapper = mount(AddressEdit);
-  wrapper.setProps({ addressInfo: { name: '123' } });
-  expect(wrapper.vm.data.name).toEqual('123');
-});
-
-test('set/get area code', async () => {
+test('should return current areas after calling getArea method', () => {
   const wrapper = mount(AddressEdit, {
-    propsData: { areaList },
+    props: { areaList },
   });
 
   expect(wrapper.vm.getArea()).toEqual([
@@ -200,42 +149,25 @@ test('set/get area code', async () => {
     { code: '110100', name: '北京市' },
     { code: '110101', name: '东城区' },
   ]);
+});
+
+test('should update current areas after calling setAreaCode method', async () => {
+  const wrapper = mount(AddressEdit, {
+    props: { areaList },
+  });
 
   wrapper.vm.setAreaCode('110102');
-
-  await later(50);
-  expect(wrapper.vm.data.areaCode).toEqual('110102');
+  await later();
   expect(wrapper.vm.getArea()).toEqual([
     { code: '110000', name: '北京市' },
     { code: '110100', name: '北京市' },
     { code: '110102', name: '西城区' },
   ]);
-
-  wrapper.vm.$refs = [];
-  wrapper.vm.setAreaCode('110102');
-  expect(wrapper.vm.getArea()).toEqual([]);
 });
 
-test('watch area code', async () => {
+test('should show search result after focusing to address detail', async () => {
   const wrapper = mount(AddressEdit, {
-    propsData: {
-      areaList: {},
-      addressInfo: {
-        areaCode: '110101',
-      },
-    },
-  });
-
-  expect(wrapper.vm.data.city).toEqual('');
-  wrapper.vm.areaList = areaList;
-
-  await later(50);
-  expect(wrapper.vm.data.city).toEqual('北京市');
-});
-
-test('show search result', async () => {
-  const wrapper = mount(AddressEdit, {
-    propsData: {
+    props: {
       showSearchResult: true,
       searchResult: [
         { name: 'name1', address: 'address1' },
@@ -245,64 +177,91 @@ test('show search result', async () => {
     },
   });
 
-  const field = wrapper.findAll('.van-field__control').at(3);
+  const field = wrapper.findAll('.van-field__control')[3];
   const input = field.element;
-  field.trigger('focus');
+  await field.trigger('focus');
 
   const items = wrapper.findAll('.van-icon-location-o');
-  items.at(0).element.parentNode.click();
+  items[0].element.parentNode.click();
+  await later();
   expect(input.value).toEqual('address1 name1');
-  items.at(1).element.parentNode.click();
+
+  items[1].element.parentNode.click();
+  await later();
   expect(input.value).toEqual('name2');
-  items.at(2).element.parentNode.click();
+
+  items[2].element.parentNode.click();
+  await later();
   expect(input.value).toEqual('address2');
 
-  field.trigger('blur');
+  await field.trigger('blur');
   await later(150);
   expect(wrapper.vm.detailFocused).toBeFalsy();
 });
 
-test('delete address', async () => {
+test('should emit delete event after clicking the delete button', async () => {
   const wrapper = mount(AddressEdit, {
-    attachToDocument: true,
-    propsData: {
+    props: {
       showDelete: true,
     },
   });
 
-  const deleteButton = wrapper.findAll('.van-button').at(1);
+  const deleteButton = wrapper.findAll('.van-button')[1];
   deleteButton.trigger('click');
-
   await later();
-  document.querySelector('.van-dialog__cancel').click();
-  deleteButton.trigger('click');
   document.querySelector('.van-dialog__confirm').click();
-
   await later();
   expect(wrapper.emitted('delete')).toBeTruthy();
+});
+
+test('should emit cancel-delete event after canceling deletion', async () => {
+  const wrapper = mount(AddressEdit, {
+    props: {
+      showDelete: true,
+    },
+  });
+
+  const deleteButton = wrapper.findAll('.van-button')[1];
+  deleteButton.trigger('click');
+  await later();
+  document.querySelector('.van-dialog__cancel').click();
+  await later();
   expect(wrapper.emitted('cancel-delete')).toBeTruthy();
 });
 
-test('setAddressDetail method', () => {
-  const { vm, data } = createComponent();
+test('should update address detail after calling the setAddressDetail method', async () => {
+  const { vm, wrapper } = createComponent();
+  const textarea = wrapper.find('.van-address-edit-detail').find('textarea');
+
+  expect(textarea.element.value).toEqual('address detail');
+
   vm.setAddressDetail('test');
-  expect(data.addressDetail).toEqual('test');
+  await later();
+  expect(textarea.element.value).toEqual('test');
 });
 
-test('select area', () => {
-  const { wrapper, data } = createComponent();
-  wrapper.find('.van-picker__confirm').trigger('click');
-  expect(data.areaCode).toEqual('110101');
-});
-
-test('click-area event', () => {
+test('should emit click-area event after clicking the area field', () => {
   const wrapper = mount(AddressEdit, {
-    propsData: {
+    props: {
       disableArea: true,
     },
   });
 
-  const field = wrapper.findAll('.van-field').at(2);
+  const field = wrapper.findAll('.van-field')[2];
   field.trigger('click');
   expect(wrapper.emitted('click-area')[0]).toBeTruthy();
+});
+
+test('should limit tel maxlength when using tel-maxlength prop', () => {
+  const wrapper = mount(AddressEdit, {
+    props: {
+      telMaxlength: 4,
+    },
+  });
+
+  const telInput = wrapper.find('input[type="tel"]');
+  telInput.element.value = '123456';
+  trigger(telInput, 'input');
+
+  expect(telInput.element.value).toEqual('1234');
 });

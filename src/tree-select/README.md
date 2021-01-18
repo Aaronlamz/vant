@@ -3,10 +3,11 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { TreeSelect } from 'vant';
 
-Vue.use(TreeSelect);
+const app = createApp();
+app.use(TreeSelect);
 ```
 
 ## Usage
@@ -15,19 +16,41 @@ Vue.use(TreeSelect);
 
 ```html
 <van-tree-select
+  v-model:active-id="state.activeId"
+  v-model:main-active-index="state.activeIndex"
   :items="items"
-  :active-id.sync="activeId"
-  :main-active-index.sync="activeIndex"
 />
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
-      items,
+  setup() {
+    const state = reactive({
       activeId: 1,
       activeIndex: 0,
+    });
+    const items = [
+      {
+        text: 'Group 1',
+        children: [
+          { text: 'Delaware', id: 1 },
+          { text: 'Florida', id: 2 },
+        ],
+      },
+      {
+        text: 'Group 2',
+        children: [
+          { text: 'Alabama', id: 5 },
+          { text: 'Kansas', id: 6 },
+        ],
+      },
+    ];
+
+    return {
+      state,
+      items,
     };
   },
 };
@@ -37,19 +60,41 @@ export default {
 
 ```html
 <van-tree-select
+  v-model:active-id="state.activeIds"
+  v-model:main-active-index="state.activeIndex"
   :items="items"
-  :active-id.sync="activeIds"
-  :main-active-index.sync="activeIndex"
 />
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
-      items,
-      activeIds: [1, 2],
+  setup() {
+    const state = reactive({
+      activeId: [1, 2],
       activeIndex: 0,
+    });
+    const items = [
+      {
+        text: 'Group 1',
+        children: [
+          { text: 'Delaware', id: 1 },
+          { text: 'Florida', id: 2 },
+        ],
+      },
+      {
+        text: 'Group 2',
+        children: [
+          { text: 'Alabama', id: 5 },
+          { text: 'Kansas', id: 6 },
+        ],
+      },
+    ];
+
+    return {
+      state,
+      items,
     };
   },
 };
@@ -58,14 +103,18 @@ export default {
 ### Custom Content
 
 ```html
-<van-tree-select height="55vw" :items="items" :main-active-index.sync="active">
+<van-tree-select
+  v-model:main-active-index="activeIndex"
+  height="55vw"
+  :items="items"
+>
   <template #content>
     <van-image
-      v-if="active === 0"
+      v-if="activeIndex === 0"
       src="https://img.yzcdn.cn/vant/apple-1.jpg"
     />
     <van-image
-      v-if="active === 1"
+      v-if="activeIndex === 1"
       src="https://img.yzcdn.cn/vant/apple-2.jpg"
     />
   </template>
@@ -73,10 +122,13 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
+  setup() {
+    const activeIndex = ref(0);
     return {
-      active: 0,
+      activeIndex,
       items: [{ text: 'Group 1' }, { text: 'Group 2' }],
     };
   },
@@ -87,17 +139,20 @@ export default {
 
 ```html
 <van-tree-select
+  v-model:main-active-index="activeIndex"
   height="55vw"
   :items="items"
-  :main-active-index.sync="activeIndex"
 />
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
+  setup() {
+    const activeIndex = ref(0);
     return {
-      activeIndex: 0,
+      activeIndex,
       items: [
         { text: 'Group 1', children: [], dot: true },
         { text: 'Group 2', children: [], badge: 5 },
@@ -117,15 +172,15 @@ export default {
 | height | Height | _number \| string_ | `300` |
 | main-active-index | The index of selected parent node | _number \| string_ | `0` |
 | active-id | Id of selected item | _number \| string \|<br>(number \| string)[]_ | `0` |
-| max `v2.2.0` | Maximum number of selected items | _number \| string_ | `Infinity` |
-| selected-icon `v2.9.0` | Selected icon | _string_ | `success` |
+| max | Maximum number of selected items | _number \| string_ | `Infinity` |
+| selected-icon | Selected icon | _string_ | `success` |
 
 ### Events
 
 | Event | Description | Arguments |
 | --- | --- | --- |
-| click-nav | triggered when parent node is selected | index: index of selected parent |
-| click-item | triggered when item is selected | data: selected item |
+| click-nav | Emitted when parent node is selected | index: index of selected parent |
+| click-item | Emitted when item is selected | data: selected item |
 
 ### Slots
 
@@ -168,3 +223,18 @@ In every tree object, `text` property defines `id` stands for the unique key whi
   },
 ];
 ```
+
+### Less Variables
+
+How to use: [Custom Theme](#/en-US/theme).
+
+| Name                                  | Default Value       | Description |
+| ------------------------------------- | ------------------- | ----------- |
+| @tree-select-font-size                | `@font-size-md`     | -           |
+| @tree-select-nav-background-color     | `@background-color` | -           |
+| @tree-select-content-background-color | `@white`            | -           |
+| @tree-select-nav-item-padding         | `14px @padding-sm`  | -           |
+| @tree-select-item-height              | `48px`              | -           |
+| @tree-select-item-active-color        | `@red`              | -           |
+| @tree-select-item-disabled-color      | `@gray-5`           | -           |
+| @tree-select-item-selected-size       | `16px`              | -           |

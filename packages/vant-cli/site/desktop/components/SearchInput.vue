@@ -1,40 +1,38 @@
 <template>
-  <input class="van-doc-search" :placeholder="placeholder" />
+  <div id="docsearch" />
 </template>
 
 <script>
+import '@docsearch/css';
+import docsearch from '@docsearch/js';
+
 export default {
-  name: 'van-doc-search',
+  name: 'VanDocSearch',
 
   props: {
     lang: String,
     searchConfig: Object,
   },
 
-  computed: {
-    placeholder() {
-      return this.searchConfig.placeholder || 'Search...';
-    },
-  },
-
   watch: {
-    lang(lang) {
-      if (this.docsearchInstance) {
-        this.docsearchInstance.algoliaOptions.facetFilters = [`lang:${lang}`];
-      }
+    lang() {
+      this.initDocsearch();
     },
   },
 
   mounted() {
-    if (this.searchConfig) {
-      this.docsearchInstance = window.docsearch({
-        ...this.searchConfig,
-        inputSelector: '.van-doc-search',
-        algoliaOptions: {
-          facetFilters: [`lang:${this.lang}`],
-        },
-      });
-    }
+    this.initDocsearch();
+  },
+
+  methods: {
+    initDocsearch() {
+      if (this.searchConfig) {
+        docsearch({
+          ...this.searchConfig,
+          container: '#docsearch',
+        });
+      }
+    },
   },
 };
 </script>
@@ -42,60 +40,22 @@ export default {
 <style lang="less">
 @import '../../common/style/var';
 
-.van-doc-search {
-  width: 200px;
-  height: 60px;
-  margin-left: 140px;
-  color: #fff;
-  font-size: 14px;
-  background-color: transparent;
-  border: none;
+#docsearch {
+  display: inline-block;
+  vertical-align: middle;
+}
 
-  &:focus {
-    outline: none;
-  }
+.DocSearch-Button {
+  height: 32px;
+  background: #f7f8fa;
 
-  &::placeholder {
-    color: #fff;
-    opacity: 0.7;
+  &:hover {
+    box-shadow: none;
   }
 }
 
-.ds-dropdown-menu {
-  line-height: 1.8;
-}
-
-.algolia-autocomplete {
-  .algolia-docsearch-suggestion--highlight {
-    color: @van-doc-blue;
-    background-color: transparent;
-  }
-
-  .algolia-docsearch-suggestion--title {
-    font-weight: 500;
-  }
-
-  .algolia-docsearch-suggestion--text {
-    .algolia-docsearch-suggestion--highlight {
-      box-shadow: inset 0 -1px 0 0 @van-doc-blue;
-    }
-  }
-
-  .algolia-docsearch-suggestion--category-header {
-    border-bottom-color: #eee;
-  }
-
-  .ds-dropdown-menu [class^='ds-dataset-'] {
-    border: none;
-  }
-
-  .ds-dropdown-menu {
-    top: 80% !important;
-    box-shadow: 0 4px 12px #ebedf0;
-
-    &::before {
-      display: none;
-    }
-  }
+.DocSearch-Search-Icon {
+  width: 18px;
+  height: 18px;
 }
 </style>

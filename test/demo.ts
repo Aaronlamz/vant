@@ -1,20 +1,20 @@
-import Vue, { CreateElement } from 'vue';
-import '../docs/site/mobile';
+import { h } from 'vue';
 import Locale from '../src/locale';
+import enUS from '../src/locale/lang/en-US';
 import { mount, later } from '.';
+import { DemoLocaleMixin } from '../docs/site/demo-locale';
 
-const Empty = {
-  render(h: CreateElement): ReturnType<CreateElement> {
-    return h('div', [(this as any).$slots.default]);
+Locale.use('en-US', enUS);
+
+const EmptyComponent = {
+  render() {
+    return h('div', [this.$slots.default()]);
   },
   inheritAttrs: false,
 };
 
-Vue.component('demo-block', Empty);
-Vue.component('demo-section', Empty);
-
 export function snapshotDemo(Demo: any, option: any = {}) {
-  test('renders demo correctly', async () => {
+  test('should render demo and match snapshot', async () => {
     if (option.beforeTest) {
       option.beforeTest();
     }
@@ -23,11 +23,19 @@ export function snapshotDemo(Demo: any, option: any = {}) {
       Locale.add(Demo.i18n);
     }
 
-    const wrapper = mount(Demo);
+    const wrapper = mount(Demo, {
+      global: {
+        mixins: [DemoLocaleMixin],
+        components: {
+          'demo-block': EmptyComponent,
+        },
+        plugins: [(window as any).vant],
+      },
+    });
 
     await later();
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.html()).toMatchSnapshot();
 
     if (option.afterTest) {
       option.afterTest();

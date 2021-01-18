@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'van-doc-simulator',
+  name: 'VanDocSimulator',
 
   props: {
     src: String,
@@ -57,7 +57,7 @@ export default {
   overflow: hidden;
   background: #fafafa;
   border-radius: @van-doc-border-radius;
-  box-shadow: #ebedf0 0 4px 12px;
+  box-shadow: 0 8px 12px #ebedf0;
 
   @media (max-width: 1100px) {
     right: auto;
@@ -66,7 +66,7 @@ export default {
 
   @media (min-width: @van-doc-row-max-width) {
     right: 50%;
-    margin-right: -@van-doc-row-max-width / 2 + 40px;
+    margin-right: -(@van-doc-row-max-width / 2) + 24px;
   }
 
   &-fixed {

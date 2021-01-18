@@ -1,81 +1,38 @@
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 import Button from '..';
 
-test('loading-size prop', () => {
-  const wrapper = mount(Button, {
-    propsData: {
-      loading: true,
-      loadingSize: '10px',
-    },
-  });
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('click event', () => {
-  const onClick = jest.fn();
-  const wrapper = mount(Button, {
-    context: {
-      on: {
-        click: onClick,
-      },
-    },
-  });
+test('should emit click event', () => {
+  const wrapper = mount(Button);
 
   wrapper.trigger('click');
-  expect(onClick).toHaveBeenCalled();
+  expect(wrapper.emitted('click').length).toEqual(1);
 });
 
-test('not trigger click event when disabled', () => {
-  const onClick = jest.fn();
+test('should not emit click event when disabled', () => {
   const wrapper = mount(Button, {
-    propsData: {
+    props: {
       disabled: true,
     },
-    context: {
-      on: {
-        click: onClick,
-      },
-    },
   });
 
   wrapper.trigger('click');
-  expect(onClick).toHaveBeenCalledTimes(0);
+  expect(wrapper.emitted('click')).toBeFalsy();
 });
 
-test('not trigger click event when loading', () => {
-  const onClick = jest.fn();
+test('should not emit click event when loading', () => {
   const wrapper = mount(Button, {
-    propsData: {
+    props: {
       loading: true,
     },
-    context: {
-      on: {
-        click: onClick,
-      },
-    },
   });
 
   wrapper.trigger('click');
-  expect(onClick).toHaveBeenCalledTimes(0);
+  expect(wrapper.emitted('click')).toBeFalsy();
 });
 
-test('touchstart event', () => {
-  const onTouchstart = jest.fn();
+test('should hide border when color is gradient', () => {
   const wrapper = mount(Button, {
-    context: {
-      on: {
-        touchstart: onTouchstart,
-      },
-    },
-  });
-
-  wrapper.trigger('touchstart');
-  expect(onTouchstart).toHaveBeenCalled();
-});
-
-test('hide border when color is gradient', () => {
-  const wrapper = mount(Button, {
-    propsData: {
+    props: {
       color: 'linear-gradient(#000, #fff)',
     },
   });
@@ -83,13 +40,49 @@ test('hide border when color is gradient', () => {
   expect(wrapper.element.style.border).toEqual('0px');
 });
 
-test('icon-prefix prop', () => {
+test('should change icon class prefix when using icon-prefix prop', () => {
   const wrapper = mount(Button, {
-    propsData: {
+    props: {
       icon: 'success',
       iconPrefix: 'my-icon',
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render loading slot correctly', () => {
+  const wrapper = mount(Button, {
+    props: {
+      loading: true,
+    },
+    slots: {
+      loading: () => 'Custom Loading',
+    },
+  });
+
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render loading of a specific size when using loading-size prop', () => {
+  const wrapper = mount(Button, {
+    props: {
+      loading: true,
+      loadingSize: '10px',
+    },
+  });
+
+  const loading = wrapper.find('.van-loading__spinner').element;
+  expect(loading.style.width).toEqual('10px');
+  expect(loading.style.height).toEqual('10px');
+});
+
+test('should render icon in the right side when setting icon-position to right', () => {
+  const wrapper = mount(Button, {
+    props: {
+      icon: 'plus',
+      iconPosition: 'right',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
 });

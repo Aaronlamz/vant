@@ -2,8 +2,17 @@
 @import '../style/mixins/hairline';
 
 .van-action-sheet {
+  display: flex;
+  flex-direction: column;
   max-height: @action-sheet-max-height;
+  overflow: hidden;
   color: @action-sheet-item-text-color;
+
+  &__content {
+    flex: 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
   &__item,
   &__cancel {
@@ -41,6 +50,12 @@
     }
   }
 
+  &__cancel {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    color: @action-sheet-cancel-text-color;
+  }
+
   &__subname {
     margin-top: @padding-xs;
     color: @action-sheet-subname-color;
@@ -55,6 +70,7 @@
   }
 
   &__header {
+    flex-shrink: 0;
     font-weight: @font-weight-bold;
     font-size: @action-sheet-header-font-size;
     line-height: @action-sheet-header-height;
@@ -63,6 +79,7 @@
 
   &__description {
     position: relative;
+    flex-shrink: 0;
     padding: 20px @padding-md;
     color: @action-sheet-description-color;
     font-size: @action-sheet-description-font-size;
@@ -72,6 +89,11 @@
     &::after {
       .hairline-bottom(@cell-border-color, @padding-md, @padding-md);
     }
+  }
+
+  &__loading-icon .van-loading__spinner {
+    width: @action-sheet-loading-icon-size;
+    height: @action-sheet-loading-icon-size;
   }
 
   &__close {

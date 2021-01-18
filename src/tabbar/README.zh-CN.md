@@ -3,18 +3,19 @@
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Tabbar, TabbarItem } from 'vant';
 
-Vue.use(Tabbar);
-Vue.use(TabbarItem);
+const app = createApp();
+app.use(Tabbar);
+app.use(TabbarItem);
 ```
 
 ## 代码演示
 
 ### 基础用法
 
-`v-model`默认绑定选中标签的索引值，通过修改`v-model`即可切换选中的标签
+`v-model` 默认绑定选中标签的索引值，通过修改 `v-model` 即可切换选中的标签。
 
 ```html
 <van-tabbar v-model="active">
@@ -26,18 +27,19 @@ Vue.use(TabbarItem);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      active: 0,
-    };
+  setup() {
+    const active = ref(0);
+    return { active };
   },
 };
 ```
 
 ### 通过名称匹配
 
-在标签指定`name`属性的情况下，`v-model`的值为当前标签的`name`
+在标签指定 `name` 属性的情况下，`v-model` 的值为当前标签的 `name`。
 
 ```html
 <van-tabbar v-model="active">
@@ -49,18 +51,19 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      active: 'home',
-    };
+  setup() {
+    const active = ref('home');
+    return { active };
   },
 };
 ```
 
 ### 徽标提示
 
-设置`dot`属性后，会在图标右上角展示一个小红点。设置`badge`属性后，会在图标右上角展示相应的徽标
+设置 `dot` 属性后，会在图标右上角展示一个小红点；设置 `badge` 属性后，会在图标右上角展示相应的徽标。
 
 ```html
 <van-tabbar v-model="active">
@@ -73,7 +76,7 @@ export default {
 
 ### 自定义图标
 
-通过 icon 插槽自定义图标，可以通过 `slot-scope` 判断标签是否选中
+通过 `icon` 插槽自定义图标，可以通过 `slot-scope` 判断标签是否选中。
 
 ```html
 <van-tabbar v-model="active">
@@ -89,14 +92,18 @@ export default {
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
+  setup() {
+    const active = ref(0);
+    const icon = {
+      active: 'https://img.yzcdn.cn/vant/user-active.png',
+      inactive: 'https://img.yzcdn.cn/vant/user-inactive.png',
+    };
     return {
-      active: 0,
-      icon: {
-        active: 'https://img.yzcdn.cn/vant/user-active.png',
-        inactive: 'https://img.yzcdn.cn/vant/user-inactive.png',
-      },
+      icon,
+      active,
     };
   },
 };
@@ -105,7 +112,7 @@ export default {
 ### 自定义颜色
 
 ```html
-<van-tabbar v-model="active" active-color="#07c160" inactive-color="#000">
+<van-tabbar v-model="active" active-color="#ee0a24" inactive-color="#000">
   <van-tabbar-item icon="home-o">标签</van-tabbar-item>
   <van-tabbar-item icon="search">标签</van-tabbar-item>
   <van-tabbar-item icon="friends-o">标签</van-tabbar-item>
@@ -117,39 +124,42 @@ export default {
 
 ```html
 <van-tabbar v-model="active" @change="onChange">
-  <van-tabbar-item icon="home-o">标签1</van-tabbar-item>
-  <van-tabbar-item icon="search">标签2</van-tabbar-item>
-  <van-tabbar-item icon="friends-o">标签3</van-tabbar-item>
-  <van-tabbar-item icon="setting-o">标签4</van-tabbar-item>
+  <van-tabbar-item icon="home-o">标签 1</van-tabbar-item>
+  <van-tabbar-item icon="search">标签 2</van-tabbar-item>
+  <van-tabbar-item icon="friends-o">标签 3</van-tabbar-item>
+  <van-tabbar-item icon="setting-o">标签 4</van-tabbar-item>
 </van-tabbar>
 ```
 
 ```js
-import { Notify } from 'vant';
+import { ref } from 'vue';
+import { Toast } from 'vant';
 
 export default {
-  methods: {
-    onChange(index) {
-      Notify({ type: 'primary', message: index });
-    },
+  setup() {
+    const active = ref(0);
+    const onChange = (index) => {
+      Toast(`标签 ${index}`);
+    };
+
+    return {
+      icon,
+      onChange,
+    };
   },
 };
 ```
 
 ### 路由模式
 
-标签栏支持路由模式，用于搭配`vue-router`使用。路由模式下会匹配页面路径和标签的`to`属性，并自动选中对应的标签
+标签栏支持路由模式，用于搭配 `vue-router` 使用。路由模式下会匹配页面路径和标签的 `to` 属性，并自动选中对应的标签。
 
 ```html
 <router-view />
 
 <van-tabbar route>
-  <van-tabbar-item replace to="/home" icon="home-o">
-    标签
-  </van-tabbar-item>
-  <van-tabbar-item replace to="/search" icon="search">
-    标签
-  </van-tabbar-item>
+  <van-tabbar-item replace to="/home" icon="home-o">标签</van-tabbar-item>
+  <van-tabbar-item replace to="/search" icon="search">标签</van-tabbar-item>
 </van-tabbar>
 ```
 
@@ -166,8 +176,9 @@ export default {
 | active-color | 选中标签的颜色 | _string_ | `#1989fa` |
 | inactive-color | 未选中标签的颜色 | _string_ | `#7d7e80` |
 | route | 是否开启路由模式 | _boolean_ | `false` |
-| placeholder `v2.6.0` | 固定在底部时，是否在标签位置生成一个等高的占位元素 | _boolean_ | `false` |
-| safe-area-inset-bottom | 是否开启[底部安全区适配](#/zh-CN/quickstart#di-bu-an-quan-qu-gua-pei)，设置 fixed 时默认开启 | _boolean_ | `false` |
+| placeholder | 固定在底部时，是否在标签位置生成一个等高的占位元素 | _boolean_ | `false` |
+| safe-area-inset-bottom | 是否开启[底部安全区适配](#/zh-CN/advanced-usage#di-bu-an-quan-qu-gua-pei)，设置 fixed 时默认开启 | _boolean_ | `false` |
+| before-change | 切换标签前的回调函数，返回 `false` 可阻止切换，支持返回 Promise | _(name) => boolean \| Promise_ | - |
 
 ### Tabbar Events
 
@@ -181,16 +192,32 @@ export default {
 | --- | --- | --- | --- |
 | name | 标签名称，作为匹配的标识符 | _number \| string_ | 当前标签的索引值 |
 | icon | [图标名称](#/zh-CN/icon)或图片链接 | _string_ | - |
-| icon-prefix `v2.5.3` | 图标类名前缀，同 Icon 组件的 [class-prefix 属性](#/zh-CN/icon#props) | _string_ | `van-icon` |
+| icon-prefix | 图标类名前缀，同 Icon 组件的 [class-prefix 属性](#/zh-CN/icon#props) | _string_ | `van-icon` |
 | dot | 是否显示图标右上角小红点 | _boolean_ | `false` |
-| badge `v2.5.6` | 图标右上角徽标的内容 | _number \| string_ | - |
-| info | 图标右上角徽标的内容（已废弃，请使用 badge 属性） | _number \| string_ | - |
+| badge | 图标右上角徽标的内容 | _number \| string_ | - |
 | url | 点击后跳转的链接地址 | _string_ | - |
 | to | 点击后跳转的目标路由对象，同 vue-router 的 [to 属性](https://router.vuejs.org/zh/api/#to) | _string \| object_ | - |
 | replace | 是否在跳转时替换当前页面历史 | _boolean_ | `false` |
 
 ### TabbarItem Slots
 
-| 名称 | 说明       | SlotProps              |
+| 名称 | 说明       | 参数                   |
 | ---- | ---------- | ---------------------- |
 | icon | 自定义图标 | active: 是否为选中标签 |
+
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                                 | 默认值                     | 描述 |
+| ------------------------------------ | -------------------------- | ---- |
+| @tabbar-height                       | `50px`                     | -    |
+| @tabbar-z-index                      | `1`                        | -    |
+| @tabbar-background-color             | `@white`                   | -    |
+| @tabbar-item-font-size               | `@font-size-sm`            | -    |
+| @tabbar-item-text-color              | `@gray-7`                  | -    |
+| @tabbar-item-active-color            | `@blue`                    | -    |
+| @tabbar-item-active-background-color | `@tabbar-background-color` | -    |
+| @tabbar-item-line-height             | `1`                        | -    |
+| @tabbar-item-icon-size               | `22px`                     | -    |
+| @tabbar-item-margin-bottom           | `4px`                      | -    |

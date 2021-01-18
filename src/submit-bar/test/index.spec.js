@@ -1,121 +1,111 @@
 import SubmitBar from '..';
-import { mount } from '../../../test';
+import { mount } from '@vue/test-utils';
 
-test('submit event', () => {
-  const submit = jest.fn();
-  const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        price: 1,
-      },
-      on: { submit },
-    },
-  });
-
-  const button = wrapper.find('.van-button');
+test('should emit submit event when submit button is clicked', () => {
+  const wrapper = mount(SubmitBar);
+  const button = wrapper.find('.van-submit-bar__button');
   button.trigger('click');
-  expect(submit).toHaveBeenCalled();
+  expect(wrapper.emitted('submit').length).toEqual(1);
 });
 
-test('disable submit', () => {
-  const submit = jest.fn();
+test('should render disabled submit button correctly', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        price: 1,
-        disabled: true,
-      },
-      on: { submit },
+    props: {
+      disabled: true,
     },
   });
+  expect(wrapper.find('.van-submit-bar__button').html()).toMatchSnapshot();
+});
 
-  expect(wrapper).toMatchSnapshot();
-
-  // disabled
-  const button = wrapper.find('.van-button');
+test('should not emit submit event when disabled submit button is clicked', () => {
+  const wrapper = mount(SubmitBar, {
+    props: {
+      disabled: true,
+    },
+  });
+  const button = wrapper.find('.van-submit-bar__button');
   button.trigger('click');
-  expect(submit).toHaveBeenCalledTimes(0);
+  expect(wrapper.emitted('submit')).toBeFalsy();
 });
 
-test('without price', () => {
+test('should not render label without price', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        label: 'Label',
-      },
+    props: {
+      label: 'Label',
+    },
+  });
+  expect(wrapper.html().includes('Label')).toBeFalsy();
+});
+
+test('should render top slot correctly', () => {
+  const wrapper = mount(SubmitBar, {
+    slots: {
+      top: () => 'Custom Top',
+    },
+  });
+  expect(wrapper.html()).toMatchSnapshot();
+});
+
+test('should render decimal length correctly when using decimal-length prop', async () => {
+  const wrapper = mount(SubmitBar, {
+    props: {
+      price: 111,
+      decimalLength: 1,
     },
   });
 
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-submit-bar__price').html()).toMatchSnapshot();
+
+  await wrapper.setProps({ decimalLength: 0 });
+  expect(wrapper.find('.van-submit-bar__price').html()).toMatchSnapshot();
 });
 
-test('top slot', () => {
+test('should render suffix-label correctly', () => {
   const wrapper = mount(SubmitBar, {
-    scopedSlots: {
-      top: () => 'top',
+    props: {
+      price: 111,
+      label: 'Label',
+      suffixLabel: 'Suffix Label',
     },
   });
-
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-submit-bar__text').html()).toMatchSnapshot();
 });
 
-test('decimal-length prop', () => {
+test('should adjust text align when using text-align prop', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        price: 111,
-        decimalLength: 1,
-      },
+    props: {
+      price: 111,
+      textAlign: 'left',
     },
   });
-
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-submit-bar__text').element.style.textAlign).toEqual(
+    'left'
+  );
 });
 
-test('suffix-label prop', () => {
+test('should allow to disable safe-area-inset-bottom prop', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        price: 111,
-        label: 'Label',
-        suffixLabel: 'Suffix Label',
-      },
+    props: {
+      safeAreaInsetBottom: false,
     },
   });
-
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-submit-bar--unfit').exists()).toBeTruthy();
 });
 
-test('text-align prop', () => {
+test('should change the color of submit button when using button-color prop', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        price: 111,
-        textAlign: 'left',
-      },
+    props: {
+      buttonColor: 'red',
     },
   });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.find('.van-submit-bar__button').html()).toMatchSnapshot();
 });
 
-test('disable safe-area-inset-bottom prop', () => {
+test('should render button slot correctly', () => {
   const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        safeAreaInsetBottom: false,
-      },
+    slots: {
+      button: () => 'Custom button',
     },
   });
-  expect(wrapper).toMatchSnapshot();
-});
-
-test('button-color prop', () => {
-  const wrapper = mount(SubmitBar, {
-    context: {
-      props: {
-        buttonColor: 'red',
-      },
-    },
-  });
-  expect(wrapper).toMatchSnapshot();
+  expect(wrapper.html()).toMatchSnapshot();
 });

@@ -1,37 +1,90 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders demo correctly 1`] = `
+exports[`should render demo and match snapshot 1`] = `
 <div>
-  <div>
-    <div role="button" tabindex="0" class="van-cell van-cell--clickable">
-      <div class="van-cell__title"><span>基础用法</span></div><i class="van-icon van-icon-arrow van-cell__right-icon">
-        <!----></i>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Basic Usage
+      </span>
     </div>
-    <div role="button" tabindex="0" class="van-cell van-cell--clickable">
-      <div class="van-cell__title"><span>展示取消按钮</span></div><i class="van-icon van-icon-arrow van-cell__right-icon">
-        <!----></i>
-    </div>
-    <div role="button" tabindex="0" class="van-cell van-cell--clickable">
-      <div class="van-cell__title"><span>展示描述信息</span></div><i class="van-icon van-icon-arrow van-cell__right-icon">
-        <!----></i>
-    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
   </div>
-  <div>
-    <div role="button" tabindex="0" class="van-cell van-cell--clickable">
-      <div class="van-cell__title"><span>选项状态</span></div><i class="van-icon van-icon-arrow van-cell__right-icon">
-        <!----></i>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Show Cancel Button
+      </span>
     </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
   </div>
-  <div>
-    <div role="button" tabindex="0" class="van-cell van-cell--clickable">
-      <div class="van-cell__title"><span>自定义面板</span></div><i class="van-icon van-icon-arrow van-cell__right-icon">
-        <!----></i>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Show Description
+      </span>
     </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
   </div>
-  <!---->
-  <!---->
-  <!---->
-  <!---->
-  <!---->
 </div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Option Status
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<div>
+  <div class="van-cell van-cell--clickable"
+       role="button"
+       tabindex="0"
+  >
+    <div class="van-cell__title">
+      <span>
+        Custom Panel
+      </span>
+    </div>
+    <i class="van-badge__wrapper van-icon van-icon-arrow van-cell__right-icon">
+    </i>
+  </div>
+</div>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
+<transition-stub>
+</transition-stub>
 `;

@@ -1,40 +1,43 @@
 <template>
-  <demo-section>
-    <demo-block :title="t('basicUsage')">
-      <img v-for="img in imageList" :key="img" v-lazy="img" />
-    </demo-block>
+  <demo-block :title="t('basicUsage')">
+    <img v-for="img in imageList" :key="img" v-lazy="img" />
+  </demo-block>
 
-    <demo-block :title="t('title2')">
-      <div
-        v-for="img in backgroundImageList"
-        :key="img"
-        v-lazy:background-image="img"
-      />
-    </demo-block>
+  <demo-block :title="t('title2')">
+    <div
+      v-for="img in backgroundImageList"
+      :key="img"
+      v-lazy:background-image="img"
+    />
+  </demo-block>
 
-    <demo-block :title="t('title3')">
-      <lazy-component>
-        <img v-for="img in componentImageList" :key="img" v-lazy="img" />
-      </lazy-component>
-    </demo-block>
-  </demo-section>
+  <demo-block :title="t('title3')">
+    <lazy-component>
+      <img v-for="img in componentImageList" :key="img" v-lazy="img" />
+    </lazy-component>
+  </demo-block>
 </template>
 
-<script>
-export default {
-  i18n: {
-    'zh-CN': {
-      title2: '背景图懒加载',
-      title3: '懒加载模块',
-    },
-    'en-US': {
-      title2: 'Lazyload Background Image',
-      title3: 'Lazyload Component',
-    },
-  },
+<script lang="ts">
+import { useTranslate } from '@demo/use-translate';
 
-  data() {
+const i18n = {
+  'zh-CN': {
+    title2: '背景图懒加载',
+    title3: '懒加载模块',
+  },
+  'en-US': {
+    title2: 'Lazyload Background Image',
+    title3: 'Lazyload Component',
+  },
+};
+
+export default {
+  setup() {
+    const t = useTranslate(i18n);
+
     return {
+      t,
       imageList: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
         'https://img.yzcdn.cn/vant/apple-2.jpg',

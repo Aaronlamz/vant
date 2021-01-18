@@ -2,15 +2,16 @@
 
 ### 介绍
 
-创建一个遮罩层，用于强调特定的页面元素，并阻止用户进行其他操作
+创建一个遮罩层，用于强调特定的页面元素，并阻止用户进行其他操作。
 
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Overlay } from 'vant';
 
-Vue.use(Overlay);
+const app = createApp();
+app.use(Overlay);
 ```
 
 ## 代码演示
@@ -23,18 +24,19 @@ Vue.use(Overlay);
 ```
 
 ```js
+import { ref } from 'vue';
+
 export default {
-  data() {
-    return {
-      show: false
-    }
-  }
-},
+  setup() {
+    const show = ref(false);
+    return { show };
+  },
+};
 ```
 
 ### 嵌入内容
 
-通过默认插槽可以在遮罩层上嵌入任意内容
+通过默认插槽可以在遮罩层上嵌入任意内容。
 
 ```html
 <van-overlay :show="show" @click="show = false">
@@ -69,8 +71,8 @@ export default {
 | z-index | z-index 层级 | _number \| string_ | `1` |
 | duration | 动画时长，单位秒 | _number \| string_ | `0.3` |
 | class-name | 自定义类名 | _string_ | - |
-| custom-style `v2.2.5` | 自定义样式 | _object_ | - |
-| lock-scroll `v2.6.2` | 是否锁定背景滚动，锁定时蒙层里的内容也将无法滚动 | _boolean_ | `true` |
+| custom-style | 自定义样式 | _object_ | - |
+| lock-scroll | 是否锁定背景滚动，锁定时蒙层里的内容也将无法滚动 | _boolean_ | `true` |
 
 ### Events
 
@@ -80,6 +82,15 @@ export default {
 
 ### Slots
 
-| 名称             | 说明                               |
-| ---------------- | ---------------------------------- |
-| default `v2.0.5` | 默认插槽，用于在遮罩层上方嵌入内容 |
+| 名称    | 说明                               |
+| ------- | ---------------------------------- |
+| default | 默认插槽，用于在遮罩层上方嵌入内容 |
+
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                      | 默认值               | 描述 |
+| ------------------------- | -------------------- | ---- |
+| @overlay-z-index          | `1`                  | -    |
+| @overlay-background-color | `rgba(0, 0, 0, 0.7)` | -    |

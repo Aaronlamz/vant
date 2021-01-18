@@ -16,26 +16,23 @@
 </p>
 
 <p align="center">
-  🔥 <a href="https://youzan.github.io/vant">文档网站</a>
+  🔥 <a href="https://vant-contrib.gitee.io/vant">文档网站（国内）</a>
   &nbsp;
-  &nbsp;
-  💡 <a href="https://vant-contrib.gitee.io/vant">国内镜像文档</a>
-  &nbsp;
+  🌈 <a href="https://youzan.github.io/vant">文档网站（GitHub）</a>
   &nbsp;
   🇨🇳 <a href="./README.zh-CN.md">中文版介绍</a>
-  &nbsp;
-  &nbsp;
-  🚀 <a href="https://github.com/youzan/vant-weapp" target="_blank">小程序版</a>
 </p>
 
 ---
 
 ## Features
 
-- 60+ Reusable components
-- 90% Unit test coverage
+- 65+ Reusable components
+- 1kb Component average size (min+gzip)
+- 90%+ Unit test coverage
 - Extensive documentation and demos
-- Support [babel-plugin-import](https://github.com/ant-design/babel-plugin-import)
+- Support Vue 2 & Vue 3
+- Support Tree Shaking
 - Support Custom Theme
 - Support i18n
 - Support TS
@@ -44,21 +41,22 @@
 ## Install
 
 ```bash
-# Using npm
+# Install Vant 2 for Vue 2 project
 npm i vant -S
 
-# Using yarn
-yarn add vant
+# Install Vant 3 for Vue 3 project
+npm i vant@next -S
 ```
 
 ## Quickstart
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Button } from 'vant';
 import 'vant/lib/index.css';
 
-Vue.use(Button);
+const app = createApp();
+app.use(Button);
 ```
 
 See more in [Quickstart](https://youzan.github.io/vant#/en-US/quickstart).
@@ -75,8 +73,11 @@ Modern browsers and Android 4.0+, iOS 8.0+.
 
 | Project | Description |
 | --- | --- |
-| [vant-demo](https://github.com/youzan/vant-demo) | Official vant demo collection |
 | [vant-weapp](https://github.com/youzan/vant-weapp) | WeChat MiniProgram UI |
+| [vant-aliapp](https://github.com/ant-move/Vant-Aliapp) | Alipay MiniProgram UI (maintained by the community) |
+| [vant-react](https://github.com/mxdi9i7/vant-react) | Vant React (maintained by the community) |
+| [vant-use](https://youzan.github.io/vant/vant-use/) | Collection of Vant Composition APIs |
+| [vant-demo](https://github.com/youzan/vant-demo) | Collection of Vant demos |
 | [vant-cli](https://github.com/youzan/vant/tree/dev/packages/vant-cli) | Scaffold for UI library |
 | [vant-icons](https://github.com/youzan/vant/tree/dev/packages/vant-icons) | Vant icons |
 | [vant-touch-emulator](https://github.com/youzan/vant/tree/dev/packages/vant-touch-emulator) | Using vant in desktop browsers |
@@ -92,12 +93,6 @@ Modern browsers and Android 4.0+, iOS 8.0+.
 You can scan the following QR code to access the demo：
 
 <img src="https://img.yzcdn.cn/vant/preview_qrcode_20180528.png" width="220" height="220" >
-
-## Wechat Group
-
-Scan the qrcode to join our wechat discussion group, please note that you want to join Vant discussion group.
-
-<img src="https://img.yzcdn.cn/vant/wechat_20180606.png" width="220" height="292" >
 
 ## LICENSE
 

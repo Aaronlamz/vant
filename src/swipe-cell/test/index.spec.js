@@ -6,92 +6,50 @@ import {
   mockGetBoundingClientRect,
 } from '../../../test';
 
-const THRESHOLD = 0.15;
 const defaultProps = {
-  propsData: {
+  props: {
     leftWidth: 100,
     rightWidth: 100,
   },
-  scopedSlots: {
+  slots: {
     left: () => 'Left',
     right: () => 'Right',
   },
 };
 
-test('drag and show left part', () => {
+test('should allow to drag to show left part', async () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
-  triggerDrag(wrapper, 10, 0);
-  expect(wrapper).toMatchSnapshot();
+  triggerDrag(wrapper, 100, 0);
+  await later();
 
-  triggerDrag(wrapper, 50, 0);
-  expect(wrapper).toMatchSnapshot();
-
-  triggerDrag(wrapper, 500, 0);
-  expect(wrapper).toMatchSnapshot();
-
-  triggerDrag(wrapper, 0, 100);
-  expect(wrapper).toMatchSnapshot();
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(100px, 0, 0)');
 });
 
-test('drag and show right part', () => {
+test('should allow to drag to show right part', async () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
-  triggerDrag(wrapper, -50, 0);
-  expect(wrapper).toMatchSnapshot();
+  triggerDrag(wrapper, -100, 0);
+  await later();
+
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(-100px, 0, 0)');
 });
 
-test('on-close prop', () => {
+test('should call beforeClose before closing', () => {
   let position;
-  let instance;
 
   const wrapper = mount(SwipeCell, {
     ...defaultProps,
-    propsData: {
-      ...defaultProps.propsData,
-      onClose(pos, ins) {
-        position = pos;
-        instance = ins;
-      },
-    },
-  });
-
-  wrapper.trigger('click');
-  expect(position).toEqual(undefined);
-
-  wrapper.vm.open('left');
-  wrapper.trigger('click');
-  expect(position).toEqual('cell');
-
-  wrapper.find('.van-swipe-cell__left').trigger('click');
-  expect(position).toEqual('left');
-
-  wrapper.find('.van-swipe-cell__right').trigger('click');
-  expect(position).toEqual('right');
-
-  instance.close();
-  expect(instance.offset).toEqual(0);
-
-  instance.open('left');
-  wrapper.setData({ onClose: null });
-  wrapper.trigger('click');
-  expect(wrapper.vm.offset).toEqual(0);
-});
-
-test('before-close prop', () => {
-  let position;
-  let instance;
-
-  const wrapper = mount(SwipeCell, {
-    ...defaultProps,
-    propsData: {
-      ...defaultProps.propsData,
+    props: {
+      ...defaultProps.props,
       beforeClose(params) {
         ({ position } = params);
-        ({ instance } = params);
       },
     },
   });
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
 
   wrapper.trigger('click');
   expect(position).toEqual(undefined);
@@ -106,108 +64,115 @@ test('before-close prop', () => {
   wrapper.find('.van-swipe-cell__right').trigger('click');
   expect(position).toEqual('right');
 
-  instance.close();
-  expect(wrapper.vm.offset).toEqual(0);
-
-  instance.open('left');
-  wrapper.setData({ beforeClose: null });
-  wrapper.trigger('click');
-  expect(wrapper.vm.offset).toEqual(0);
+  wrapper.vm.close();
+  expect(track.style.transform).toEqual('translate3d(0px, 0, 0)');
 });
 
-test('name prop', (done) => {
+test('should close swipe cell after clicked', async () => {
+  const wrapper = mount(SwipeCell, defaultProps);
+
+  wrapper.vm.open('left');
+  await later();
+
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(100px, 0, 0)');
+
+  await wrapper.trigger('click');
+  expect(track.style.transform).toEqual('translate3d(0px, 0, 0)');
+});
+
+test('should emit open event with name when using name prop', () => {
   const wrapper = mount(SwipeCell, {
     ...defaultProps,
-    propsData: {
-      ...defaultProps.propsData,
+    props: {
+      ...defaultProps.props,
       name: 'test',
-      onClose(position, instance, detail) {
-        expect(detail.name).toEqual('test');
-        done();
-      },
     },
   });
 
   wrapper.vm.open('left');
-  wrapper.trigger('click');
+  expect(wrapper.emitted('open')[0]).toEqual([
+    { name: 'test', position: 'left' },
+  ]);
 });
 
-test('should reset after drag', () => {
+test('should emit close event with name when using name prop', () => {
+  const wrapper = mount(SwipeCell, {
+    ...defaultProps,
+    props: {
+      ...defaultProps.props,
+      name: 'test',
+    },
+  });
+
+  wrapper.vm.open('left');
+  wrapper.vm.close();
+  expect(wrapper.emitted('close')[0]).toEqual([{ name: 'test' }]);
+});
+
+test('should reset transform after short draging', async () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
-  triggerDrag(wrapper, defaultProps.leftWidth * THRESHOLD - 1, 0);
-  expect(wrapper.vm.offset).toEqual(0);
+  triggerDrag(wrapper, 5, 0);
+  await later();
+
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(0px, 0, 0)');
 });
 
-test('disabled prop', () => {
+test('should not allow to drag when using disabled prop', async () => {
   const wrapper = mount(SwipeCell, {
-    propsData: {
-      ...defaultProps.propsData,
+    props: {
+      ...defaultProps.props,
       disabled: true,
     },
   });
 
   triggerDrag(wrapper, 50, 0);
-  expect(wrapper.vm.offset).toEqual(0);
+  await later();
+
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(0px, 0, 0)');
 });
 
-test('auto calc width', async () => {
+test('should auto calc width', async () => {
   const restoreMock = mockGetBoundingClientRect({
     width: 50,
   });
 
   const wrapper = mount(SwipeCell, {
-    scopedSlots: defaultProps.scopedSlots,
+    slots: defaultProps.slots,
   });
 
-  await later();
   triggerDrag(wrapper, 100, 0);
-  expect(wrapper).toMatchSnapshot();
+  await later();
 
+  const track = wrapper.find('.van-swipe-cell__wrapper').element;
+  expect(track.style.transform).toEqual('translate3d(50px, 0, 0)');
   restoreMock();
 });
 
-test('render one side', async () => {
-  const restoreMock = mockGetBoundingClientRect({
-    width: 50,
-  });
-
-  const wrapper = mount(SwipeCell, {
-    scopedSlots: {
-      left: defaultProps.scopedSlots.left,
-    },
-  });
-
-  await later();
-  triggerDrag(wrapper, 100, 0);
-  expect(wrapper).toMatchSnapshot();
-
-  restoreMock();
-});
-
-test('trigger open event when open left side', () => {
+test('should emit open event when opening left side', () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
   triggerDrag(wrapper, 50, 0);
   expect(wrapper.emitted('open')[0][0]).toEqual({
     name: '',
-    detail: '',
     position: 'left',
   });
 });
 
-test('trigger open event when open right side', () => {
+test('should emit open event when opening right side', () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
   triggerDrag(wrapper, -50, 0);
   expect(wrapper.emitted('open')[0][0]).toEqual({
     name: '',
-    detail: '',
     position: 'right',
   });
 });
 
-test('trigger close event when closed', () => {
+test('should emit close event after closed', () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
   wrapper.vm.open('left');
@@ -215,15 +180,16 @@ test('trigger close event when closed', () => {
 
   expect(wrapper.emitted('close')[0][0]).toEqual({
     name: '',
-    position: undefined,
   });
 });
 
-test('should not trigger close event again when already closed', () => {
+test('should not trigger close event again if already closed', () => {
   const wrapper = mount(SwipeCell, defaultProps);
 
   wrapper.vm.open('left');
   wrapper.vm.close();
+  expect(wrapper.emitted('close').length).toEqual(1);
+
   wrapper.vm.close();
   expect(wrapper.emitted('close').length).toEqual(1);
 });

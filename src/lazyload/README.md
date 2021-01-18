@@ -3,13 +3,14 @@
 ### Install
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Lazyload } from 'vant';
 
-Vue.use(Lazyload);
+const app = createApp();
+app.use(Lazyload);
 
 // with options
-Vue.use(Lazyload, {
+app.use(Lazyload, {
   lazyComponent: true,
 });
 ```
@@ -24,7 +25,7 @@ Vue.use(Lazyload, {
 
 ```js
 export default {
-  data() {
+  setup() {
     return {
       imageList: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
@@ -47,7 +48,7 @@ Use `v-lazy:background-image` to set background url, and declare the height of t
 
 ```js
 // set `lazyComponent` option
-Vue.use(Lazyload, {
+app.use(Lazyload, {
   lazyComponent: true,
 });
 ```

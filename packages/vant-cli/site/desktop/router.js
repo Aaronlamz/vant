@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { nextTick } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import { isMobile, decamelize } from '../common';
 import { config, documents } from 'site-desktop-shared';
 import { getLang, setDefaultLang } from '../common/locales';
@@ -47,26 +47,32 @@ function getRoutes() {
 
   if (locales) {
     routes.push({
-      path: '*',
-      redirect: route => `/${getLangFromRoute(route)}/`,
+      name: 'notFound',
+      path: '/:path(.*)+',
+      redirect: (route) => ({
+        name: getLangFromRoute(route),
+      }),
     });
   } else {
     routes.push({
-      path: '*',
-      redirect: '/',
+      name: 'notFound',
+      path: '/:path(.*)+',
+      redirect: {
+        name: 'home',
+      },
     });
   }
 
   function addHomeRoute(Home, lang) {
     routes.push({
-      name: lang,
+      name: lang || 'home',
       path: `/${lang || ''}`,
       component: Home,
       meta: { lang },
     });
   }
 
-  names.forEach(name => {
+  names.forEach((name) => {
     const { component, lang } = parseName(name);
 
     if (component === 'home') {
@@ -98,14 +104,12 @@ function getRoutes() {
   return routes;
 }
 
-Vue.use(VueRouter);
-
-export const router = new VueRouter({
-  mode: 'hash',
+export const router = createRouter({
+  history: createWebHashHistory(),
   routes: getRoutes(),
   scrollBehavior(to) {
     if (to.hash) {
-      return { selector: to.hash };
+      return { el: to.hash };
     }
 
     return { x: 0, y: 0 };
@@ -113,7 +117,7 @@ export const router = new VueRouter({
 });
 
 router.afterEach(() => {
-  Vue.nextTick(() => window.syncPath());
+  nextTick(() => window.syncPath());
 });
 
 window.vueRouter = router;

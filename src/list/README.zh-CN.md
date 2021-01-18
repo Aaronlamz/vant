@@ -7,148 +7,169 @@
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { List } from 'vant';
 
-Vue.use(List);
+const app = createApp();
+app.use(List);
 ```
 
 ## 代码演示
 
 ### 基础用法
 
-List 组件通过`loading`和`finished`两个变量控制加载状态，当组件滚动到底部时，会触发`load`事件并将`loading`设置成`true`。此时可以发起异步操作并更新数据，数据更新完毕后，将`loading`设置成`false`即可。若数据已全部加载完毕，则直接将`finished`设置成`true`即可。
+List 组件通过 `loading` 和 `finished` 两个变量控制加载状态，当组件滚动到底部时，会触发 `load` 事件并将 `loading` 设置成 `true`。此时可以发起异步操作并更新数据，数据更新完毕后，将 `loading` 设置成 `false` 即可。若数据已全部加载完毕，则直接将 `finished` 设置成 `true` 即可。
 
 ```html
 <van-list
-  v-model="loading"
-  :finished="finished"
+  v-model:loading="state.loading"
+  :finished="state.finished"
   finished-text="没有更多了"
   @load="onLoad"
 >
-  <van-cell v-for="item in list" :key="item" :title="item" />
+  <van-cell v-for="item in state.list" :key="item" :title="item" />
 </van-list>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       list: [],
       loading: false,
       finished: false,
-    };
-  },
-  methods: {
-    onLoad() {
+    });
+
+    const onLoad = () => {
       // 异步更新数据
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       setTimeout(() => {
         for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1);
+          state.list.push(state.list.length + 1);
         }
 
         // 加载状态结束
-        this.loading = false;
+        state.loading = false;
 
         // 数据全部加载完成
-        if (this.list.length >= 40) {
-          this.finished = true;
+        if (state.list.length >= 40) {
+          state.finished = true;
         }
       }, 1000);
-    },
+    };
+
+    return {
+      state,
+      onLoad,
+    };
   },
 };
 ```
 
 ### 错误提示
 
-若列表数据加载失败，将`error`设置成`true`即可显示错误提示，用户点击错误提示后会重新触发 load 事件。
+若列表数据加载失败，将 `error` 设置成 `true` 即可显示错误提示，用户点击错误提示后会重新触发 load 事件。
 
 ```html
 <van-list
-  v-model="loading"
-  :error.sync="error"
+  v-model:loading="state.loading"
+  v-model:error="state.error"
   error-text="请求失败，点击重新加载"
   @load="onLoad"
 >
-  <van-cell v-for="item in list" :key="item" :title="item" />
+  <van-cell v-for="item in state.list" :key="item" :title="item" />
 </van-list>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       list: [],
       error: false,
       loading: false,
-    };
-  },
-  methods: {
-    onLoad() {
+    });
+
+    const onLoad = () => {
       fetchSomeThing().catch(() => {
-        this.error = true;
+        state.error = true;
       });
-    },
+    };
+
+    return {
+      state,
+      onLoad,
+    };
   },
 };
 ```
 
 ### 下拉刷新
 
-List 组件可以与 [PullRefresh](#/zh-CN/pull-refresh) 组件结合使用，实现下拉刷新的效果
+List 组件可以与 [PullRefresh](#/zh-CN/pull-refresh) 组件结合使用，实现下拉刷新的效果。
 
 ```html
-<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+<van-pull-refresh v-model="state.refreshing" @refresh="onRefresh">
   <van-list
-    v-model="loading"
-    :finished="finished"
+    v-model:loading="state.loading"
+    :finished="state.finished"
     finished-text="没有更多了"
     @load="onLoad"
   >
-    <van-cell v-for="item in list" :key="item" :title="item" />
+    <van-cell v-for="item in state.list" :key="item" :title="item" />
   </van-list>
 </van-pull-refresh>
 ```
 
 ```js
+import { reactive } from 'vue';
+
 export default {
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       list: [],
       loading: false,
       finished: false,
       refreshing: false,
-    };
-  },
-  methods: {
-    onLoad() {
+    });
+
+    const onLoad = () => {
       setTimeout(() => {
-        if (this.refreshing) {
-          this.list = [];
-          this.refreshing = false;
+        if (state.refreshing) {
+          state.list = [];
+          state.refreshing = false;
         }
 
         for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1);
+          state.list.push(state.list.length + 1);
         }
-        this.loading = false;
+        state.loading = false;
 
-        if (this.list.length >= 40) {
-          this.finished = true;
+        if (state.list.length >= 40) {
+          state.finished = true;
         }
       }, 1000);
-    },
-    onRefresh() {
+    };
+
+    const onRefresh = () => {
       // 清空列表数据
-      this.finished = false;
+      state.finished = false;
 
       // 重新加载数据
       // 将 loading 设置为 true，表示处于加载状态
-      this.loading = true;
-      this.onLoad();
-    },
+      state.loading = true;
+      onLoad();
+    };
+
+    return {
+      state,
+      onLoad,
+      onRefresh,
+    };
   },
 };
 ```
@@ -159,7 +180,7 @@ export default {
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| v-model | 是否处于加载状态，加载过程中不触发`load`事件 | _boolean_ | `false` |
+| v-model:loading | 是否处于加载状态，加载过程中不触发`load`事件 | _boolean_ | `false` |
 | finished | 是否已加载完成，加载完成后不再触发`load`事件 | _boolean_ | `false` |
 | error | 是否加载失败，加载失败后点击错误提示可以重新<br>触发`load`事件，必须使用`sync`修饰符 | _boolean_ | `false` |
 | offset | 滚动条与底部距离小于 offset 时触发`load`事件 | _number \| string_ | `300` |
@@ -177,7 +198,7 @@ export default {
 
 ### 方法
 
-通过 ref 可以获取到 List 实例并调用实例方法，详见[组件实例方法](#/zh-CN/quickstart#zu-jian-shi-li-fang-fa)
+通过 ref 可以获取到 List 实例并调用实例方法，详见[组件实例方法](#/zh-CN/advanced-usage#zu-jian-shi-li-fang-fa)。
 
 | 方法名 | 说明 | 参数 | 返回值 |
 | --- | --- | --- | --- |
@@ -191,6 +212,17 @@ export default {
 | loading  | 自定义底部加载中提示       |
 | finished | 自定义加载完成后的提示文案 |
 | error    | 自定义加载失败后的提示文案 |
+
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                    | 默认值          | 描述 |
+| ----------------------- | --------------- | ---- |
+| @list-icon-margin-right | `5px`           | -    |
+| @list-text-color        | `@gray-6`       | -    |
+| @list-text-font-size    | `@font-size-md` | -    |
+| @list-text-line-height  | `50px`          | -    |
 
 ## 常见问题
 

@@ -1,22 +1,38 @@
 # Search 搜索
 
+### 介绍
+
+用于搜索场景的输入框组件。
+
 ### 引入
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import { Search } from 'vant';
 
-Vue.use(Search);
+const app = createApp();
+app.use(Search);
 ```
 
 ## 代码演示
 
 ### 基础用法
 
-v-model 用于控制搜索框中的文字，background 可以自定义搜索框外部背景色。
+`v-model` 用于控制搜索框中的文字，`background` 可以自定义搜索框外部背景色。
 
 ```html
 <van-search v-model="value" placeholder="请输入搜索关键词" />
+```
+
+```js
+import { ref } from 'vue';
+
+export default {
+  setup() {
+    const value = ref('');
+    return { value };
+  },
+};
 ```
 
 ### 事件监听
@@ -36,21 +52,23 @@ Search 组件提供了 `search` 和 `cancel` 事件，`search` 事件在点击�
 ```
 
 ```js
+import { ref } from 'vue';
 import { Toast } from 'vant';
 
 export default {
-  data() {
-    return {
-      value: '',
-    };
-  },
-  methods: {
-    onSearch(val) {
+  setup() {
+    const value = ref('');
+    const onSearch = (val) => {
       Toast(val);
-    },
-    onCancel() {
+    };
+    const onCancel = () => {
       Toast('取消');
-    },
+    };
+    return {
+      value,
+      onSearch,
+      onCancel,
+    };
   },
 };
 ```
@@ -120,10 +138,10 @@ export default {
 | maxlength | 输入的最大字符数 | _number \| string_ | - |
 | placeholder | 占位提示文字 | _string_ | - |
 | clearable | 是否启用清除图标，点击清除图标后会清空输入框 | _boolean_ | `true` |
-| clear-trigger `v2.9.1` | 显示清除图标的时机，`always` 表示输入框不为空时展示，<br>`focus` 表示输入框聚焦且不为空时展示 | _string_ | `focus` |
+| clear-trigger | 显示清除图标的时机，`always` 表示输入框不为空时展示，<br>`focus` 表示输入框聚焦且不为空时展示 | _string_ | `focus` |
 | autofocus | 是否自动聚焦，iOS 系统不支持该属性 | _boolean_ | `false` |
 | show-action | 是否在搜索框右侧显示取消按钮 | _boolean_ | `false` |
-| action-text `v2.2.2` | 取消按钮文字 | _boolean_ | `取消` |
+| action-text | 取消按钮文字 | _boolean_ | `取消` |
 | disabled | 是否禁用输入框 | _boolean_ | `false` |
 | readonly | 是否将输入框设为只读 | _boolean_ | `false` |
 | error | 是否将输入内容标红 | _boolean_ | `false` |
@@ -133,14 +151,23 @@ export default {
 
 ### Events
 
-| 事件名 | 说明                 | 回调参数                       |
-| ------ | -------------------- | ------------------------------ |
-| search | 确定搜索时触发       | _value: string (当前输入的值)_ |
-| input  | 输入框内容变化时触发 | _value: string (当前输入的值)_ |
-| focus  | 输入框获得焦点时触发 | _event: Event_                 |
-| blur   | 输入框失去焦点时触发 | _event: Event_                 |
-| clear  | 点击清除按钮后触发   | _event: Event_                 |
-| cancel | 点击取消按钮时触发   | -                              |
+| 事件名             | 说明                 | 回调参数                       |
+| ------------------ | -------------------- | ------------------------------ |
+| search             | 确定搜索时触发       | _value: string (当前输入的值)_ |
+| update:model-value | 输入框内容变化时触发 | _value: string (当前输入的值)_ |
+| focus              | 输入框获得焦点时触发 | _event: Event_                 |
+| blur               | 输入框失去焦点时触发 | _event: Event_                 |
+| clear              | 点击清除按钮后触发   | _event: Event_                 |
+| cancel             | 点击取消按钮时触发   | -                              |
+
+### 方法
+
+通过 ref 可以获取到 Search 实例并调用实例方法，详见[组件实例方法](#/zh-CN/advanced-usage#zu-jian-shi-li-fang-fa)。
+
+| 方法名 | 说明           | 参数 | 返回值 |
+| ------ | -------------- | ---- | ------ |
+| focus  | 获取输入框焦点 | -    | -      |
+| blur   | 取消输入框焦点 | -    | -      |
 
 ### Slots
 
@@ -152,8 +179,26 @@ export default {
 | left-icon  | 自定义左侧图标（搜索框内）                              |
 | right-icon | 自定义右侧图标（搜索框内）                              |
 
+### 样式变量
+
+组件提供了下列 Less 变量，可用于自定义样式，使用方法请参考[主题定制](#/zh-CN/theme)。
+
+| 名称                             | 默认值             | 描述 |
+| -------------------------------- | ------------------ | ---- |
+| @search-padding                  | `10px @padding-sm` | -    |
+| @search-background-color         | `@white`           | -    |
+| @search-content-background-color | `@gray-1`          | -    |
+| @search-input-height             | `34px`             | -    |
+| @search-label-padding            | `0 5px`            | -    |
+| @search-label-color              | `@text-color`      | -    |
+| @search-label-font-size          | `@font-size-md`    | -    |
+| @search-left-icon-color          | `@gray-6`          | -    |
+| @search-action-padding           | `0 @padding-xs`    | -    |
+| @search-action-text-color        | `@text-color`      | -    |
+| @search-action-font-size         | `@font-size-md`    | -    |
+
 ## 常见问题
 
 ### 在桌面端点击清除按钮无效？
 
-清除按钮监听是的移动端 Touch 事件，参见[在桌面端使用](#/zh-CN/quickstart#zai-zhuo-mian-duan-shi-yong)。
+清除按钮监听是的移动端 Touch 事件，参见[桌面端适配](#/zh-CN/advanced-usage#zhuo-mian-duan-gua-pei)。
